@@ -1,0 +1,70 @@
+## Cloudflared configuration for the User Portal
+## Maps the public hostname `app.wisecare.co` to the local dev server running on port 3000
+## NOTES:
+##  - Replace <TUNNEL-UUID> and path to credentials-file with values from your Cloudflare dashboard
+##  - You must create a Tunnel (either via the Cloudflare dashboard or `cloudflared tunnel create <name>`)
+##  - The generated credentials JSON is usually saved under your user profile (e.g., C:\Users\<you>\.cloudflared\<TUNNEL-UUID>.json)
+
+tunnel: <TUNNEL-UUID>
+credentials-file: C:\Users\%USERNAME%\.cloudflared\<TUNNEL-UUID>.json
+
+ingress:
+  - hostname: app.wisecare.co
+    service: http://localhost:3000
+
+  # Catch-all: return 404 for any other hostname
+  - service: http_status:404
+
+# Optional originRequest settings for controlling how cloudflared connects to your origin
+originRequest:
+  # Set to true only if you need to skip TLS verification for the origin (not recommended in production)
+  # noTLSVerify: true
+  # Optional HTTP host header to send to the origin
+  # httpHostHeader: "localhost:3000"
+
+# -------------------------------
+# HTTPS / Self-signed cert notes
+# -------------------------------
+# Recommended approach for local dev (secure): use mkcert to create a locally-trusted certificate
+# 1) Install mkcert (Windows - PowerShell as admin):
+#    choco install mkcert
+#    mkcert -install
+# 2) Generate certs for your local hostnames (run inside project root):
+#    mkcert app.wisecare.co localhost 127.0.0.1 ::1
+#    This will create files like: "app.wisecare.co+2.pem" and "app.wisecare.co+2-key.pem"
+# 3) Configure your dev server (Vite) to serve HTTPS using those cert/key files. Example in `vite.config.ts`:
+#
+#    import { defineConfig } from 'vite'
+#    import react from '@vitejs/plugin-react'
+#    import fs from 'fs'
+#
+#    export default defineConfig({
+#      plugins: [react()],
+#      server: {
+#        https: {
+#          key: fs.readFileSync('./app.wisecare.co+2-key.pem'),
+#          cert: fs.readFileSync('./app.wisecare.co+2.pem')
+#        },
+#        host: true,
+#        port: 3000
+#      }
+#    })
+#
+# 4) Update this config to point Cloudflared at the HTTPS origin (uncomment/replace the ingress service):
+#
+# ingress:
+#   - hostname: app.wisecare.co
+#     service: https://localhost:3000
+#
+# With mkcert, the certificate is trusted by your machine's root store so cloudflared (which uses the OS CA store)
+# should validate the certificate correctly and you won't need to set `noTLSVerify`.
+#
+# Fallback (less secure) option: if you cannot use mkcert, you can keep your origin running with a self-signed cert
+# and set `noTLSVerify: true` under `originRequest` to skip verification. This is not recommended, but can be useful
+# for quick testing:
+#
+# originRequest:
+#   noTLSVerify: true
+
+# Example run command (after adding your tunnel and credentials):
+# cloudflared tunnel --config ".cloudflared/config.yml" run <TUNNEL-NAME>

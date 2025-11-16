@@ -1,0 +1,10 @@
+-- NOTE:
+-- This migration previously attempted to ALTER auth.users, which fails on Supabase Cloud
+-- with "must be owner of relation users" because auth.users is owned by the internal Auth role.
+-- We are purposefully making this migration a no-op to avoid the error.
+--
+-- Phone verification will be mirrored to public.profiles instead.
+-- See the new migration that adds:
+--   ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_phone_number_verified boolean NOT NULL DEFAULT false;
+--
+-- This file is intentionally left blank.

@@ -1,0 +1,23 @@
+{
+  "name": "healthguard-monorepo",
+  "version": "1.0.0",
+  "description": "HealthGuard - Secure healthcare subscription management platform",
+  "private": true,
+  "scripts": {
+    "dev:user": "cd apps/user-portal && npm run dev",
+    "dev:admin": "cd apps/admin-portal && npm run dev",
+    "build:user": "cd apps/user-portal && npm run build",
+    "build:admin": "cd apps/admin-portal && npm run build",
+    "install:all": "npm install && cd apps/user-portal && npm install && cd ../admin-portal && npm install",
+    "test": "cd apps/user-portal && npm test && cd ../admin-portal && npm test",
+    "lint": "cd apps/user-portal && npm run lint && cd ../admin-portal && npm run lint",
+    "type-check": "cd apps/user-portal && npm run type-check && cd ../admin-portal && npm run type-check"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "supabase": "^2.45.5"
+  }
+}
