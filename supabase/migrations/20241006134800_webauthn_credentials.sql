@@ -1,6 +1,6 @@
 -- WebAuthn credentials table for biometric authentication
 CREATE TABLE user_webauthn_credentials (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   credential_id TEXT NOT NULL UNIQUE,
   public_key JSONB NOT NULL,

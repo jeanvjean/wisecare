@@ -1,0 +1,848 @@
+{
+  "info": {
+    "name": "WiseCare API Collection",
+    "description": "Complete API documentation for WiseCare application edge functions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "apikey",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{SUPABASE_ANON_KEY}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "SUPABASE_URL",
+      "value": "https://your-project.supabase.co",
+      "type": "string"
+    },
+    {
+      "key": "SUPABASE_ANON_KEY",
+      "value": "your-anon-key",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "User Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"StrongPass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"country\": \"nigeria\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/signup",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "signup"]
+            },
+            "description": "Create a new user account and send email verification OTP"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"StrongPass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"country\": \"nigeria\"\n}"
+                },
+                "url": {
+                  "raw": "{{SUPABASE_URL}}/functions/v1/signup",
+                  "host": ["{{SUPABASE_URL}}"],
+                  "path": ["functions", "v1", "signup"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"User created, OTP sent to email\",\n  \"otp_id\": \"uuid-string\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Resend Signup OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"resendOnly\": true\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/signup",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "signup"]
+            },
+            "description": "Resend email verification OTP for existing unverified user"
+          }
+        },
+        {
+          "name": "Verify Signup OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/signup",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "signup"]
+            },
+            "description": "Verify email with OTP code"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phone Verification",
+      "item": [
+        {
+          "name": "Send Phone OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}",
+                "description": "Optional: Include if user is authenticated"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"sms\",\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/send-phone-otp",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "send-phone-otp"]
+            },
+            "description": "Send OTP to phone number via SMS or WhatsApp. Set deliveryMethod to 'sms' or 'whatsapp'. Country is automatically determined from user profile."
+          },
+          "response": [
+            {
+              "name": "SMS Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"sms\",\n  \"email\": \"user@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{SUPABASE_URL}}/functions/v1/send-phone-otp",
+                  "host": ["{{SUPABASE_URL}}"],
+                  "path": ["functions", "v1", "send-phone-otp"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"OTP sent to phone number via sms\",\n  \"otp_id\": \"uuid-string\",\n  \"delivery_method\": \"sms\",\n  \"formatted_phone\": \"+2341234567890\"\n}"
+            },
+            {
+              "name": "WhatsApp Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"whatsapp\",\n  \"email\": \"user@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{SUPABASE_URL}}/functions/v1/send-phone-otp",
+                  "host": ["{{SUPABASE_URL}}"],
+                  "path": ["functions", "v1", "send-phone-otp"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"OTP sent to phone number via whatsapp\",\n  \"otp_id\": \"uuid-string\",\n  \"delivery_method\": \"whatsapp\",\n  \"formatted_phone\": \"+2341234567890\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Send WhatsApp OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}",
+                "description": "Optional: Include if user is authenticated"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"whatsapp\",\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/send-phone-otp",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "send-phone-otp"]
+            },
+            "description": "Send OTP to phone number via WhatsApp. Requires WhatsApp Business API setup."
+          }
+        },
+        {
+          "name": "Verify Phone OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}",
+                "description": "Optional: Include if user is authenticated"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"otp\": \"123456\",\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/verify-phone-otp",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "verify-phone-otp"]
+            },
+            "description": "Verify phone number with OTP code"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Sign In",
+      "item": [
+        {
+          "name": "Sign In with Email/Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/signin",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "signin"]
+            },
+            "description": "Sign in user with email and password"
+          }
+        },
+        {
+          "name": "Send Password Reset OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/send-reset-otp",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "send-reset-otp"]
+            },
+            "description": "Send password reset OTP to email"
+          }
+        },
+        {
+          "name": "Verify Password Reset OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/verify-reset-otp",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "verify-reset-otp"]
+            },
+            "description": "Verify password reset OTP and get recovery token"
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"NewStrongPass123!\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/reset-password",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "reset-password"]
+            },
+            "description": "Reset user password with OTP verification"
+          }
+        }
+      ]
+    },
+    {
+      "name": "WebAuthn Authentication",
+      "item": [
+        {
+          "name": "Get WebAuthn Registration Options",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/webauthn-register",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "webauthn-register"]
+            },
+            "description": "Get WebAuthn registration options for biometric authentication setup"
+          }
+        },
+        {
+          "name": "Register WebAuthn Credential",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"credential\": {\n    \"id\": \"credential-id\",\n    \"rawId\": \"base64-raw-id\",\n    \"type\": \"public-key\",\n    \"response\": {\n      \"clientDataJSON\": \"base64-client-data\",\n      \"attestationObject\": \"base64-attestation\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/webauthn-register",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "webauthn-register"]
+            },
+            "description": "Register a WebAuthn credential for biometric authentication"
+          }
+        },
+        {
+          "name": "Get WebAuthn Authentication Options",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/webauthn-authenticate/options",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "webauthn-authenticate", "options"]
+            },
+            "description": "Get WebAuthn authentication options for sign-in"
+          }
+        },
+        {
+          "name": "Authenticate with WebAuthn",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"assertion\": {\n    \"id\": \"credential-id\",\n    \"rawId\": \"base64-raw-id\",\n    \"type\": \"public-key\",\n    \"response\": {\n      \"clientDataJSON\": \"base64-client-data\",\n      \"authenticatorData\": \"base64-auth-data\",\n      \"signature\": \"base64-signature\",\n      \"userHandle\": \"base64-user-handle\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/webauthn-authenticate",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "webauthn-authenticate"]
+            },
+            "description": "Authenticate user with WebAuthn biometric credential"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscription Management",
+      "item": [
+        {
+          "name": "Get Available Plans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/get-plans",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "get-plans"]
+            },
+            "description": "Get all available subscription plans"
+          }
+        },
+        {
+          "name": "Create Checkout Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planId\": \"uuid-of-plan\",\n  \"successUrl\": \"https://app.example.com/success\",\n  \"cancelUrl\": \"https://app.example.com/cancel\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/create-checkout",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "create-checkout"]
+            },
+            "description": "Create a Stripe checkout session for subscription"
+          }
+        },
+        {
+          "name": "Get Current Subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/get-current-subscription",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "get-current-subscription"]
+            },
+            "description": "Get user's current subscription details"
+          }
+        },
+        {
+          "name": "Get Billing History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/get-billing-history",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "get-billing-history"]
+            },
+            "description": "Get user's billing history and invoices"
+          }
+        },
+        {
+          "name": "Cancel Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"No longer needed\",\n  \"feedback\": \"Service was good but expensive\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/cancel-subscription",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "cancel-subscription"]
+            },
+            "description": "Cancel user's subscription with optional feedback"
+          }
+        },
+        {
+          "name": "Reactivate Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/reactivate-subscription",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "reactivate-subscription"]
+            },
+            "description": "Reactivate a cancelled subscription"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Beneficiary Management",
+      "item": [
+        {
+          "name": "Add Beneficiary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"relationship\": \"daughter\",\n  \"phoneNumber\": \"+2341234567890\",\n  \"email\": \"jane@example.com\",\n  \"dateOfBirth\": \"2000-01-01\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/add-beneficiary",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "add-beneficiary"]
+            },
+            "description": "Add a new beneficiary to the user's account"
+          }
+        },
+        {
+          "name": "Remove Beneficiary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"beneficiaryId\": \"uuid-of-beneficiary\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/remove-beneficiary",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "remove-beneficiary"]
+            },
+            "description": "Remove a beneficiary from the user's account"
+          }
+        },
+        {
+          "name": "Activate Beneficiaries",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"beneficiaryIds\": [\"uuid-1\", \"uuid-2\"]\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/activate-beneficiaries",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "activate-beneficiaries"]
+            },
+            "description": "Activate multiple beneficiaries for coverage"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Onboarding & Profile",
+      "item": [
+        {
+          "name": "Complete Onboarding",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"carePreference\": \"family_care\",\n  \"fundingFrequency\": \"monthly\",\n  \"paymentFrequency\": \"monthly\",\n  \"numberOfLovedOnes\": 2,\n  \"mattersMost\": [\"health\", \"safety\"],\n  \"lovedOnesCountries\": [\"nigeria\", \"united_kingdom\"],\n  \"lovedOnesCities\": [\"uuid-city-1\", \"uuid-city-2\"]\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/complete-onboarding",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "complete-onboarding"]
+            },
+            "description": "Complete user onboarding with preferences and loved ones information"
+          }
+        },
+        {
+          "name": "Get User by Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/get-user-by-email",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "get-user-by-email"]
+            },
+            "description": "Get user information by email address (admin function)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Email & Notifications",
+      "item": [
+        {
+          "name": "Send Purchase Success Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planName\": \"Premium Care\",\n  \"amount\": 99.99,\n  \"currency\": \"USD\",\n  \"billingCycle\": \"monthly\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/send-purchase-success-email",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "send-purchase-success-email"]
+            },
+            "description": "Send purchase confirmation email after successful subscription"
+          }
+        },
+        {
+          "name": "Send Waitlist Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"firstName\": \"John\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/send-waitlist-email",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "send-waitlist-email"]
+            },
+            "description": "Send welcome email to users joining the waitlist"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhooks & Integration",
+      "item": [
+        {
+          "name": "Chargebee Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_type\": \"subscription_created\",\n  \"content\": {\n    \"subscription\": {\n      \"id\": \"sub_123\",\n      \"customer_id\": \"cus_456\",\n      \"status\": \"active\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/chargebee-webhook",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "chargebee-webhook"]
+            },
+            "description": "Handle Chargebee webhook events for subscription management"
+          }
+        },
+        {
+          "name": "Upsert Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subscriptionData\": {\n    \"id\": \"sub_123\",\n    \"user_id\": \"user-uuid\",\n    \"status\": \"active\",\n    \"current_period_start\": \"2024-01-01T00:00:00Z\",\n    \"current_period_end\": \"2024-02-01T00:00:00Z\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/upsert-subscription",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "upsert-subscription"]
+            },
+            "description": "Create or update subscription record (typically called by webhooks)"
+          }
+        }
+      ]
+    }
+  ]
+}

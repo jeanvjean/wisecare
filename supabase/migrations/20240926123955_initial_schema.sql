@@ -1,5 +1,4 @@
 -- Enable necessary extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Profiles table (extends auth.users)
@@ -22,14 +21,14 @@ CREATE TABLE countries (
 
 -- Cities table
 CREATE TABLE cities (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   country_code TEXT REFERENCES countries(country_code) ON DELETE CASCADE
 );
 
 -- Plans table
 CREATE TABLE plans (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT,
   price DECIMAL(10,2) NOT NULL,
@@ -43,7 +42,7 @@ CREATE TABLE plans (
 
 -- User onboarding table
 CREATE TABLE user_onboarding (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   care_preference TEXT,
   funding_frequency TEXT,
@@ -56,7 +55,7 @@ CREATE TABLE user_onboarding (
 
 -- User loved ones countries junction table
 CREATE TABLE user_loved_ones_countries (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   country_code TEXT REFERENCES countries(country_code) ON DELETE CASCADE,
   UNIQUE(user_id, country_code)
@@ -64,7 +63,7 @@ CREATE TABLE user_loved_ones_countries (
 
 -- User loved ones cities junction table
 CREATE TABLE user_loved_ones_cities (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   city_id UUID REFERENCES cities(id) ON DELETE CASCADE,
   UNIQUE(user_id, city_id)
@@ -72,7 +71,7 @@ CREATE TABLE user_loved_ones_cities (
 
 -- Subscriptions table
 CREATE TABLE subscriptions (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   plan_id UUID REFERENCES plans(id) ON DELETE CASCADE,
   chargebee_subscription_id TEXT UNIQUE,
@@ -86,7 +85,7 @@ CREATE TABLE subscriptions (
 
 -- Dependents table
 CREATE TABLE dependents (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   subscription_id UUID REFERENCES subscriptions(id) ON DELETE CASCADE,
   first_name TEXT NOT NULL,
@@ -101,7 +100,7 @@ CREATE TABLE dependents (
 
 -- Admin roles table
 CREATE TABLE admin_roles (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
   permissions JSONB NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -110,7 +109,7 @@ CREATE TABLE admin_roles (
 
 -- Admin users table
 CREATE TABLE admin_users (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   role_id UUID REFERENCES admin_roles(id) ON DELETE CASCADE,
   is_active BOOLEAN DEFAULT TRUE,
@@ -120,7 +119,7 @@ CREATE TABLE admin_users (
 
 -- Audit logs table
 CREATE TABLE audit_logs (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   table_name TEXT NOT NULL,
   action TEXT NOT NULL,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,

@@ -15,7 +15,7 @@ const addPhoneSchema = z.object({
 type AddPhoneForm = z.infer<typeof addPhoneSchema>
 
 function AddPhoneNumber() {
-  const { sendPhoneOTP, loading } = useAuthStore()
+  const { sendPhoneOTP, loading, user } = useAuthStore()
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()

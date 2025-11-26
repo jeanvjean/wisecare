@@ -21,10 +21,10 @@ function FileUpload() {
     setMessage(null)
 
     try {
-      // Upload to Supabase Storage bucket 'uploads' under user-specific folder
+      // Upload to Supabase Storage bucket 'wisecare-files' under user-specific folder
       const filePath = `user-${user.id}/${Date.now()}-${file.name}`
       const { data, error } = await supabase.storage
-        .from('uploads') // Ensure this bucket exists and is configured
+        .from('wisecare-files') // Ensure this bucket exists and is configured
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
@@ -34,7 +34,7 @@ function FileUpload() {
 
       // Get public URL since bucket is public
       const { data: urlData } = supabase.storage
-        .from('uploads')
+        .from('wisecare-files')
         .getPublicUrl(data.path)
 
       setMessage(`File uploaded successfully! Public URL: ${urlData.publicUrl}`)

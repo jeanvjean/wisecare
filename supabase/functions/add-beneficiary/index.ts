@@ -165,8 +165,9 @@ const emailHtml = `<!DOCTYPE html>
   <body>
     <div style="text-align: center; margin-top: 24px">
       <div>
-        <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759159590006-wisecarelogo.png" alt="" />
-        <h6 style="margin-top: 34px; font-weight: 700; font-size: 16px">
+        <img src="https://yzeydhelqlsurdbooacd.supabase.co/storage/v1/object/public/wisecare-files/logo-wisecare.png" 
+             alt="WiseCare Logo" 
+             style="width: 180px; height: auto; max-width: 100%; display: block; margin: 0 auto;" />
           Hi ${beneficiaryFirstName},
         </h6>
         <p style="font-size: 16px; color: #000000; font-weight: 400">
@@ -193,18 +194,25 @@ const emailHtml = `<!DOCTYPE html>
                 <a href="http://" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: white;">✉️ Get Support</a>  </p>
                 <p style="margin-top: 15px; margin-bottom: 15px;">You're receiving this email because you have a WiseCare account or were added as a beneficiary.If you'd prefer not to receive these notifications, you can [unsubscribe here].</p>
                 <p>Registered in England & Wales | Company No. 16613659</p>
-                <div style="display: flex; gap: 40px; justify-content: center; margin-top: 22px;">
-                  <a href="http://" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759160285952-001-facebook.png" alt="" style="width: 24px; height: 24px; object-fit: contain;">
-                  </a>
-                  <a href="http://" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759160243681-003-twitter.png" alt="" style="width: 24px; height: 24px; object-fit: contain;">
-                  </a>
-                  <a href="http://" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759160188984-Instagram.png" alt="" style="width: 24px; height: 24px; object-fit: contain;">
-                  </a>
-
-                </div>
+                <table align="center" cellpadding="0" cellspacing="0" role="presentation" style="margin:auto; margin-top:22px;">
+                  <tr>
+                    <td align="center" style="padding: 0 20px;">
+                      <a href="https://facebook.com/wisecare" target="_blank" rel="noopener noreferrer" style="display:inline-block;">
+                        <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759160285952-001-facebook.png" alt="Facebook" width="24" height="24" style="display:block; object-fit:contain;">
+                      </a>
+                    </td>
+                    <td align="center" style="padding: 0 20px;">
+                      <a href="https://twitter.com/wisecare" target="_blank" rel="noopener noreferrer" style="display:inline-block;">
+                        <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759160243681-003-twitter.png" alt="Twitter" width="24" height="24" style="display:block; object-fit:contain;">
+                      </a>
+                    </td>
+                    <td align="center" style="padding: 0 20px;">
+                      <a href="https://instagram.com/wisecare" target="_blank" rel="noopener noreferrer" style="display:inline-block;">
+                        <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759160188984-Instagram.png" width="24" height="24" style="display:block; object-fit:contain;">
+                      </a>
+                    </td>
+                  </tr>
+                </table>
             </div>
             </div>
       </div>

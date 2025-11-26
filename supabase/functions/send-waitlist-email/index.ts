@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
   <body>
     <div style="text-align: center; margin-top: 24px">
       <div>
-        <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759159590006-wisecarelogo.png" alt="WiseCare Logo" />
+        <img src="https://api.wisecare.co/storage/v1/object/public/uploads/Logo.png" alt="WiseCare Logo" />
         <h6 style="margin-top: 34px; font-weight: 700; font-size: 16px">
           Hi {{UserName}},
         </h6>
@@ -204,13 +204,13 @@ Deno.serve(async (req) => {
               "
             >
               <a href="http://" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center;">
-                <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759160285952-001-facebook.png" alt="" style="width: 24px; height: 24px; object-fit: contain;">
+                <img src="https://api.wisecare.co/storage/v1/object/public/uploads/001-facebook.png" alt="" style="width: 24px; height: 24px; object-fit: contain;">
               </a>
               <a href="http://" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center;">
-                <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759160243681-003-twitter.png" alt="" style="width: 24px; height: 24px; object-fit: contain;">
+                <img src="https://api.wisecare.co/storage/v1/object/public/uploads/003-twitter.png" alt="" style="width: 24px; height: 24px; object-fit: contain;">
               </a>
               <a href="http://" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center;">
-                <img src="https://zksgxfqfmtiitjypxaoi.supabase.co/storage/v1/object/public/uploads/user-f03b5240-2e87-4d75-abe7-4e1cb63a1bb8/1759160188984-Instagram.png" alt="" style="width: 24px; height: 24px; object-fit: contain;">
+                <img src="https://api.wisecare.co/storage/v1/object/public/uploads/Instagram.png" alt="" style="width: 24px; height: 24px; object-fit: contain;">
               </a>
             </div>
           </div>
