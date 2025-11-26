@@ -51,9 +51,36 @@ function Onboarding() {
   const { data: countries = [] } = useQuery({
     queryKey: ['countries'],
     queryFn: async () => {
-      const response = await fetch('https://countriesnow.space/api/v0.1/countries')
-      const data = await response.json()
-      return data.data.map((country: any) => country.country)
+      try {
+        const response = await fetch('https://restcountries.com/v3.1/all?fields=name')
+        if (response.ok) {
+          const data = await response.json()
+          return data.map((country: any) => country.name.common).sort()
+        } else {
+          // Fallback to static list if API fails
+          return [
+            'Afghanistan', 'Albania', 'Algeria', 'Argentina', 'Australia', 'Austria', 'Bangladesh', 'Belgium',
+            'Brazil', 'Canada', 'Chile', 'China', 'Colombia', 'Denmark', 'Egypt', 'Finland', 'France', 'Germany',
+            'Greece', 'India', 'Indonesia', 'Ireland', 'Italy', 'Japan', 'Jordan', 'Kenya', 'Malaysia', 'Mexico',
+            'Morocco', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Pakistan', 'Peru', 'Philippines',
+            'Poland', 'Portugal', 'Russia', 'Saudi Arabia', 'Singapore', 'South Africa', 'South Korea', 'Spain',
+            'Sweden', 'Switzerland', 'Thailand', 'Turkey', 'Ukraine', 'United Arab Emirates', 'United Kingdom',
+            'United States', 'Vietnam'
+          ]
+        }
+      } catch (error) {
+        console.error('Failed to fetch countries:', error)
+        // Fallback to static list
+        return [
+          'Afghanistan', 'Albania', 'Algeria', 'Argentina', 'Australia', 'Austria', 'Bangladesh', 'Belgium',
+          'Brazil', 'Canada', 'Chile', 'China', 'Colombia', 'Denmark', 'Egypt', 'Finland', 'France', 'Germany',
+          'Greece', 'India', 'Indonesia', 'Ireland', 'Italy', 'Japan', 'Jordan', 'Kenya', 'Malaysia', 'Mexico',
+          'Morocco', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Pakistan', 'Peru', 'Philippines',
+          'Poland', 'Portugal', 'Russia', 'Saudi Arabia', 'Singapore', 'South Africa', 'South Korea', 'Spain',
+          'Sweden', 'Switzerland', 'Thailand', 'Turkey', 'Ukraine', 'United Arab Emirates', 'United Kingdom',
+          'United States', 'Vietnam'
+        ]
+      }
     },
     staleTime: 24 * 60 * 60 * 1000 // 24 hours
   })
@@ -65,6 +92,63 @@ function Onboarding() {
     queryFn: async () => {
       if (selectedCountries.length === 0) return []
 
+      // Comprehensive fallback cities for selected countries
+      const fallbackCities: { [key: string]: string[] } = {
+        'Afghanistan': ['Kabul', 'Kandahar', 'Herat', 'Mazar-i-Sharif', 'Jalalabad', 'Kunduz', 'Ghazni', 'Balkh', 'Baghlan', 'Gardez'],
+        'Albania': ['Tirana', 'Durrës', 'Vlorë', 'Elbasan', 'Shkodër', 'Fier', 'Korçë', 'Berat', 'Lushnjë', 'Pogradec'],
+        'Algeria': ['Algiers', 'Oran', 'Constantine', 'Annaba', 'Blida', 'Béjaïa', 'Batna', 'Sétif', 'Sidi Bel Abbès', 'Biskra'],
+        'Argentina': ['Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza', 'Tucumán', 'La Plata', 'Mar del Plata', 'Salta', 'Santa Fe', 'San Juan'],
+        'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Canberra', 'Newcastle', 'Wollongong', 'Logan City'],
+        'Austria': ['Vienna', 'Graz', 'Linz', 'Salzburg', 'Innsbruck', 'Klagenfurt', 'Villach', 'Wels', 'Sankt Pölten', 'Dornbirn'],
+        'Bangladesh': ['Dhaka', 'Chittagong', 'Khulna', 'Rajshahi', 'Sylhet', 'Barisal', 'Rangpur', 'Comilla', 'Narayanganj', 'Gazipur'],
+        'Belgium': ['Brussels', 'Antwerp', 'Ghent', 'Charleroi', 'Liège', 'Bruges', 'Namur', 'Leuven', 'Mons', 'Aalst'],
+        'Brazil': ['São Paulo', 'Rio de Janeiro', 'Brasília', 'Salvador', 'Fortaleza', 'Belo Horizonte', 'Manaus', 'Curitiba', 'Recife', 'Porto Alegre'],
+        'Canada': ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Edmonton', 'Ottawa', 'Winnipeg', 'Quebec City', 'Hamilton', 'Kitchener'],
+        'Chile': ['Santiago', 'Puente Alto', 'Antofagasta', 'Viña del Mar', 'Valparaíso', 'Talcahuano', 'San Bernardo', 'Temuco', 'Iquique', 'Concepción'],
+        'China': ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Tianjin', 'Chongqing', 'Hong Kong', 'Chengdu', 'Nanjing', 'Wuhan'],
+        'Colombia': ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Cúcuta', 'Bucaramanga', 'Pereira', 'Santa Marta', 'Ibagué'],
+        'Denmark': ['Copenhagen', 'Aarhus', 'Odense', 'Aalborg', 'Frederiksberg', 'Esbjerg', 'Randers', 'Kolding', 'Vejle', 'Roskilde'],
+        'Egypt': ['Cairo', 'Alexandria', 'Giza', 'Port Said', 'Suez', 'Luxor', 'Mansoura', 'Tanta', 'Asyut', 'Ismailia'],
+        'Finland': ['Helsinki', 'Espoo', 'Tampere', 'Vantaa', 'Oulu', 'Turku', 'Jyväskylä', 'Lahti', 'Kuopio', 'Kouvola'],
+        'France': ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille'],
+        'Germany': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Dortmund', 'Essen', 'Leipzig'],
+        'Greece': ['Athens', 'Thessaloniki', 'Patras', 'Heraklion', 'Larissa', 'Volos', 'Rhodes', 'Ioannina', 'Chania', 'Chalcis'],
+        'India': ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Ahmedabad', 'Chennai', 'Kolkata', 'Surat', 'Pune', 'Jaipur'],
+        'Indonesia': ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Bekasi', 'Semarang', 'Tangerang', 'Makassar', 'Palembang', 'Depok'],
+        'Ireland': ['Dublin', 'Cork', 'Limerick', 'Galway', 'Waterford', 'Drogheda', 'Dundalk', 'Bray', 'Navan', 'Kilkenny'],
+        'Italy': ['Rome', 'Milan', 'Naples', 'Turin', 'Palermo', 'Genoa', 'Bologna', 'Florence', 'Bari', 'Catania'],
+        'Japan': ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kobe', 'Kawasaki', 'Saitama', 'Hiroshima'],
+        'Jordan': ['Amman', 'Zarqa', 'Irbid', 'Russeifa', 'Al-Quwaysimah', 'Wadi Al-Seer', 'Tafilah', 'Madaba', 'Sahab', 'Jalul'],
+        'Kenya': ['Nairobi', 'Mombasa', 'Nakuru', 'Eldoret', 'Kisumu', 'Thika', 'Malindi', 'Kitale', 'Garissa', 'Kakamega'],
+        'Malaysia': ['Kuala Lumpur', 'George Town', 'Johor Bahru', 'Ipoh', 'Kuching', 'Shah Alam', 'Kota Kinabalu', 'Seremban', 'Kuantan', 'Petaling Jaya'],
+        'Mexico': ['Mexico City', 'Tijuana', 'Ecatepec', 'León', 'Puebla', 'Ciudad Juárez', 'Guadalajara', 'Zapopan', 'Monterrey', 'Chihuahua'],
+        'Morocco': ['Casablanca', 'Rabat', 'Fès', 'Sale', 'Marrakech', 'Agadir', 'Tangier', 'Meknès', 'Oujda', 'Kenitra'],
+        'Netherlands': ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Tilburg', 'Groningen', 'Almere', 'Breda', 'Nijmegen'],
+        'New Zealand': ['Auckland', 'Wellington', 'Christchurch', 'Manurewa', 'Hamilton', 'Lower Hutt', 'Tauranga', 'Dunedin', 'Palmerston North', 'Napier'],
+        'Nigeria': ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Port Harcourt', 'Benin City', 'Kaduna', 'Jos', 'Ilorin', 'Oyo'],
+        'Norway': ['Oslo', 'Bergen', 'Trondheim', 'Stavanger', 'Drammen', 'Fredrikstad', 'Kristiansand', 'Sandnes', 'Tromsø', 'Sarpsborg'],
+        'Pakistan': ['Karachi', 'Lahore', 'Faisalabad', 'Rawalpindi', 'Gujranwala', 'Peshawar', 'Multan', 'Hyderabad', 'Islamabad', 'Quetta'],
+        'Peru': ['Lima', 'Arequipa', 'Trujillo', 'Chiclayo', 'Piura', 'Iquitos', 'Cusco', 'Chimbote', 'Huancayo', 'Tacna'],
+        'Philippines': ['Quezon City', 'Manila', 'Caloocan', 'Davao City', 'Cebu City', 'Zamboanga City', 'Taguig', 'Antipolo', 'Pasig', 'Cagayan de Oro'],
+        'Poland': ['Warsaw', 'Kraków', 'Łódź', 'Wrocław', 'Poznań', 'Gdańsk', 'Szczecin', 'Bydgoszcz', 'Lublin', 'Katowice'],
+        'Portugal': ['Lisbon', 'Porto', 'Amadora', 'Braga', 'Setúbal', 'Coimbra', 'Queluz', 'Funchal', 'Cacém', 'Vila Nova de Gaia'],
+        'Russia': ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Nizhny Novgorod', 'Kazan', 'Chelyabinsk', 'Omsk', 'Samara', 'Rostov-on-Don'],
+        'Saudi Arabia': ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Sultanah', 'Dammam', 'Taif', 'Tabuk', 'Buraidah', 'Khamis Mushait'],
+        'Singapore': ['Singapore'],
+        'South Africa': ['Johannesburg', 'Cape Town', 'Durban', 'Pretoria', 'Port Elizabeth', 'Bloemfontein', 'East London', 'Pietermaritzburg', 'Benoni', 'Tembisa'],
+        'South Korea': ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Suwon', 'Ulsan', 'Changwon', 'Seongnam'],
+        'Spain': ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Málaga', 'Murcia', 'Palma', 'Las Palmas', 'Bilbao'],
+        'Sweden': ['Stockholm', 'Gothenburg', 'Malmö', 'Uppsala', 'Linköping', 'Västerås', 'Örebro', 'Helsingborg', 'Norrköping', 'Jönköping'],
+        'Switzerland': ['Zürich', 'Geneva', 'Basel', 'Lausanne', 'Bern', 'Winterthur', 'Lucerne', 'St. Gallen', 'Lugano', 'Biel/Bienne'],
+        'Thailand': ['Bangkok', 'Nonthaburi', 'Nakhon Ratchasima', 'Chiang Mai', 'Hat Yai', 'Pak Kret', 'Si Racha', 'Phra Pradaeng', 'Lampang', 'Khon Kaen'],
+        'Turkey': ['Istanbul', 'Ankara', 'İzmir', 'Bursa', 'Adana', 'Gaziantep', 'Konya', 'Antalya', 'Kayseri', 'Mersin'],
+        'Ukraine': ['Kyiv', 'Kharkiv', 'Dnipro', 'Odesa', 'Donetsk', 'Zaporizhzhia', 'Lviv', 'Kryvyi Rih', 'Mykolaiv', 'Mariupol'],
+        'United Arab Emirates': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Al Ain', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain'],
+        'United Kingdom': ['London', 'Birmingham', 'Manchester', 'Liverpool', 'Leeds', 'Sheffield', 'Bristol', 'Newcastle', 'Sunderland', 'Brighton'],
+        'United States': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'],
+        'Vietnam': ['Ho Chi Minh City', 'Hanoi', 'Da Nang', 'Haiphong', 'Biên Hòa', 'Cần Thơ', 'Huế', 'Nha Trang', 'Cam Ranh', 'Vũng Tàu']
+      }
+
       const citiesPromises = selectedCountries.map(async (country: string) => {
         try {
           const response = await fetch('https://countriesnow.space/api/v0.1/countries/cities', {
@@ -72,15 +156,22 @@ function Onboarding() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ country })
           })
-          const data = await response.json()
-          return data.data || []
+          if (response.ok) {
+            const data = await response.json()
+            const apiCities = data.data || []
+            // If API returns cities, use them; otherwise use fallback
+            return apiCities.length > 0 ? apiCities : (fallbackCities[country] || [`${country} City`, 'Other'])
+          } else {
+            return fallbackCities[country] || [`${country} City`, 'Other']
+          }
         } catch {
-          return []
+          return fallbackCities[country] || [`${country} City`, 'Other']
         }
       })
 
       const citiesArrays = await Promise.all(citiesPromises)
-      return citiesArrays.flat()
+      const allCities = citiesArrays.flat()
+      return [...new Set(allCities)].sort() // Remove duplicates and sort
     },
     enabled: selectedCountries.length > 0,
     staleTime: 60 * 60 * 1000 // 1 hour

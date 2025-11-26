@@ -27,11 +27,11 @@ function PlanSelection() {
   useEffect(() => {
     const detectCurrency = async () => {
       try {
-        // Using ipapi.co for free geo-location detection
-        const response = await fetch('https://ipapi.co/json/')
+        // Using api.country.is for free geo-location detection
+        const response = await fetch('https://api.country.is')
         if (response.ok) {
           const data = await response.json()
-          const detectedCountry = data.country_code || 'US'
+          const detectedCountry = data.country || 'US'
           const detectedCurrency = COUNTRY_TO_CURRENCY[detectedCountry] || 'USD'
           console.log('Detected country:', detectedCountry)
           console.log('Detected currency:', detectedCurrency)
@@ -43,7 +43,7 @@ function PlanSelection() {
         setCurrency('USD')
       }
     }
-    
+
     detectCurrency()
   }, [])
 

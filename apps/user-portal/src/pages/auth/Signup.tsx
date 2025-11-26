@@ -39,21 +39,76 @@ function Signup() {
     const fetchCountries = async () => {
       try {
         const response = await fetch('https://restcountries.com/v3.1/all?fields=name')
-        const data = await response.json()
-        const countryList = data
-          .map((country: any) => ({
-            value: country.name.common,
-            label: country.name.common
-          }))
-          .sort((a: any, b: any) => a.label.localeCompare(b.label))
-        setCountries(countryList)
+        if (response.ok) {
+          const data = await response.json()
+          const countryList = data
+            .map((country: any) => ({
+              value: country.name.common,
+              label: country.name.common
+            }))
+            .sort((a: any, b: any) => a.label.localeCompare(b.label))
+          setCountries(countryList)
+        } else {
+          throw new Error('API response not ok')
+        }
       } catch (err) {
         console.error('Failed to fetch countries:', err)
-        // Fallback to static list
+        // Fallback to comprehensive static list
         setCountries([
+          { value: 'Afghanistan', label: 'Afghanistan' },
+          { value: 'Albania', label: 'Albania' },
+          { value: 'Algeria', label: 'Algeria' },
+          { value: 'Argentina', label: 'Argentina' },
+          { value: 'Australia', label: 'Australia' },
+          { value: 'Austria', label: 'Austria' },
+          { value: 'Bangladesh', label: 'Bangladesh' },
+          { value: 'Belgium', label: 'Belgium' },
+          { value: 'Brazil', label: 'Brazil' },
+          { value: 'Canada', label: 'Canada' },
+          { value: 'Chile', label: 'Chile' },
+          { value: 'China', label: 'China' },
+          { value: 'Colombia', label: 'Colombia' },
+          { value: 'Denmark', label: 'Denmark' },
+          { value: 'Egypt', label: 'Egypt' },
+          { value: 'Finland', label: 'Finland' },
+          { value: 'France', label: 'France' },
+          { value: 'Germany', label: 'Germany' },
+          { value: 'Greece', label: 'Greece' },
+          { value: 'India', label: 'India' },
+          { value: 'Indonesia', label: 'Indonesia' },
+          { value: 'Ireland', label: 'Ireland' },
+          { value: 'Italy', label: 'Italy' },
+          { value: 'Japan', label: 'Japan' },
+          { value: 'Jordan', label: 'Jordan' },
+          { value: 'Kenya', label: 'Kenya' },
+          { value: 'Malaysia', label: 'Malaysia' },
+          { value: 'Mexico', label: 'Mexico' },
+          { value: 'Morocco', label: 'Morocco' },
+          { value: 'Netherlands', label: 'Netherlands' },
+          { value: 'New Zealand', label: 'New Zealand' },
+          { value: 'Nigeria', label: 'Nigeria' },
+          { value: 'Norway', label: 'Norway' },
+          { value: 'Pakistan', label: 'Pakistan' },
+          { value: 'Peru', label: 'Peru' },
+          { value: 'Philippines', label: 'Philippines' },
+          { value: 'Poland', label: 'Poland' },
+          { value: 'Portugal', label: 'Portugal' },
+          { value: 'Russia', label: 'Russia' },
+          { value: 'Saudi Arabia', label: 'Saudi Arabia' },
+          { value: 'Singapore', label: 'Singapore' },
+          { value: 'South Africa', label: 'South Africa' },
+          { value: 'South Korea', label: 'South Korea' },
+          { value: 'Spain', label: 'Spain' },
+          { value: 'Sweden', label: 'Sweden' },
+          { value: 'Switzerland', label: 'Switzerland' },
+          { value: 'Thailand', label: 'Thailand' },
+          { value: 'Turkey', label: 'Turkey' },
+          { value: 'Ukraine', label: 'Ukraine' },
+          { value: 'United Arab Emirates', label: 'United Arab Emirates' },
           { value: 'United Kingdom', label: 'United Kingdom' },
-          { value: 'United States', label: 'United States' }
-        ])
+          { value: 'United States', label: 'United States' },
+          { value: 'Vietnam', label: 'Vietnam' }
+        ].sort((a, b) => a.label.localeCompare(b.label)))
       } finally {
         setCountriesLoading(false)
       }

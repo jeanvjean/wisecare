@@ -16,9 +16,13 @@ type CountryCode = typeof COUNTRY_CODES[keyof typeof COUNTRY_CODES]
 // For trial: Use verified numbers or upgrade to paid account
 const SENDER_PHONE_NUMBERS = {
   nigeria: Deno.env.get('TWILIO_ALPHA_NUMERIC_SENDER'), // Alphanumeric sender ID (supported in Nigeria)
+  ng: Deno.env.get('TWILIO_ALPHA_NUMERIC_SENDER'), // Alphanumeric sender ID (supported in Nigeria)
   united_kingdom: Deno.env.get('TWILIO_ALPHA_NUMERIC_SENDER'), // Alphanumeric sender ID (supported in UK)
+  gb: Deno.env.get('TWILIO_ALPHA_NUMERIC_SENDER'), // Alphanumeric sender ID (supported in UK)
   united_states: Deno.env.get('TWILIO_PHONE_NUMBER'), // Phone number required in US
-  canada: Deno.env.get('TWILIO_PHONE_NUMBER') // Phone number required in Canada
+  us: Deno.env.get('TWILIO_PHONE_NUMBER'), // Phone number required in US
+  canada: Deno.env.get('TWILIO_PHONE_NUMBER'), // Phone number required in Canada
+  ca: Deno.env.get('TWILIO_PHONE_NUMBER') // Phone number required in Canada
 } as const
 
 type SenderPhoneNumber = typeof SENDER_PHONE_NUMBERS[keyof typeof SENDER_PHONE_NUMBERS]

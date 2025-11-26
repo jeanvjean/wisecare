@@ -228,6 +228,7 @@ Deno.serve(async (req) => {
       subject: subject,
       text: '',
       html: emailHtml,
+      type: 'regular'
     });
 
     if (mailResult.rejected.length > 0) {

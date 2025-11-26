@@ -199,7 +199,8 @@ WiseCare Team`
       to: userData.user.email!,
       subject: emailSubject,
       text: emailText,
-      html: emailHtml
+      html: emailHtml,
+      type: 'regular'
     })
 
     console.log('Purchase success email sent via Postmark SMTP to user:', userData.user.email)

@@ -82,6 +82,9 @@ TWILIO_AUTH_TOKEN=your-twilio-auth-token
 TWILIO_PHONE_NUMBER=+1234567890
 TWILIO_MESSAGING_SERVICE_SID=MGxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+# Email Configuration (Supabase Resend/Postmark)
+WELCOME_EMAIL_SENDER=your-welcome-email@yourdomain.com
+
 # Chargebee Configuration (for subscriptions)
 CHARGEBEE_SITE=your-chargebee-site
 CHARGEBEE_API_KEY=your-chargebee-api-key
