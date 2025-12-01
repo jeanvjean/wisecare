@@ -502,14 +502,96 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"planId\": \"uuid-of-plan\",\n  \"successUrl\": \"https://app.example.com/success\",\n  \"cancelUrl\": \"https://app.example.com/cancel\"\n}"
+              "raw": "{\n  \"itemPriceId\": \"uuid-of-chargebee-item-price\",\n  \"customerId\": \"user-uuid\",\n  \"customerEmail\": \"user@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"quantity\": 1,\n  \"promoCode\": \"WELCOME10\"\n}"
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/create-checkout",
               "host": ["{{SUPABASE_URL}}"],
               "path": ["functions", "v1", "create-checkout"]
             },
-            "description": "Create a Stripe checkout session for subscription"
+            "description": "Create a Chargebee hosted checkout session for subscription. Include promoCode for discount application."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"itemPriceId\": \"uuid-of-chargebee-item-price\",\n  \"customerId\": \"user-uuid\",\n  \"customerEmail\": \"user@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"quantity\": 1,\n  \"promoCode\": \"WELCOME10\"\n}"
+                },
+                "url": {
+                  "raw": "{{SUPABASE_URL}}/functions/v1/create-checkout",
+                  "host": ["{{SUPABASE_URL}}"],
+                  "path": ["functions", "v1", "create-checkout"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"hostedPageUrl\": \"https://your-site.chargebee.com/pages/v3/ABC123\",\n  \"hostedPageId\": \"ABC123\"\n}"
+            },
+            {
+              "name": "Invalid Promo Code Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"itemPriceId\": \"uuid-of-chargebee-item-price\",\n  \"customerId\": \"user-uuid\",\n  \"customerEmail\": \"user@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"quantity\": 1,\n  \"promoCode\": \"INVALID\"\n}"
+                },
+                "url": {
+                  "raw": "{{SUPABASE_URL}}/functions/v1/create-checkout",
+                  "host": ["{{SUPABASE_URL}}"],
+                  "path": ["functions", "v1", "create-checkout"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Invalid promo code\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Checkout Session (No Promo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemPriceId\": \"uuid-of-chargebee-item-price\",\n  \"customerId\": \"user-uuid\",\n  \"customerEmail\": \"user@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/create-checkout",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "create-checkout"]
+            },
+            "description": "Create a Chargebee hosted checkout session without promo code"
           }
         },
         {
@@ -704,7 +786,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"carePreference\": \"family_care\",\n  \"fundingFrequency\": \"monthly\",\n  \"paymentFrequency\": \"monthly\",\n  \"numberOfLovedOnes\": 2,\n  \"mattersMost\": [\"health\", \"safety\"],\n  \"lovedOnesCountries\": [\"nigeria\", \"united_kingdom\"],\n  \"lovedOnesCities\": [\"uuid-city-1\", \"uuid-city-2\"]\n}"
+              "raw": "{\n  \"carePreference\": \"family_care\",\n  \"mattersMost\": [\"health\", \"safety\"],\n  \"ageRanges\": [\"18 - 60 (Adult and dependents)\", \"Over 60 (Parents and senior)\"],\n  \"fundingFrequency\": \"monthly\",\n  \"paymentFrequency\": \"monthly\",\n  \"numberOfLovedOnes\": 2,\n  \"lovedOnesCountries\": [\"nigeria\", \"united_kingdom\"],\n  \"lovedOnesCities\": [\"uuid-city-1\", \"uuid-city-2\"]\n}"
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/complete-onboarding",
@@ -787,6 +869,94 @@
               "path": ["functions", "v1", "send-waitlist-email"]
             },
             "description": "Send welcome email to users joining the waitlist"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Campaign Management",
+      "item": [
+        {
+          "name": "Create Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}",
+                "description": "Admin authentication token required"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Year Special\",\n  \"description\": \"20% off for new subscribers\",\n  \"code\": \"NY2025\",\n  \"discountType\": \"percentage\",\n  \"discountValue\": 0.20,\n  \"validFrom\": \"2025-01-01T00:00:00Z\",\n  \"validUntil\": \"2025-01-31T23:59:59Z\",\n  \"usageLimit\": 1000,\n  \"applicablePlans\": null,\n  \"chargebeeCouponId\": \"NY2025\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/create-campaign",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "create-campaign"]
+            },
+            "description": "Create a new discount campaign. NOTE: On Chargebee Product Catalog 2.0 we do NOT create coupons via API. You must create the coupon in Chargebee first, then pass its ID in `chargebeeCouponId` (or ensure `code` matches the Chargebee coupon ID). The function only stores the mapping and uses it later during checkout. Requires admin authentication.\n\nBody fields:\n- name (string, required)\n- description (string, optional)\n- code (string, required) – human-friendly promo code, also used as fallback coupon ID\n- discountType (\"fixed\" | \"percentage\", required)\n- discountValue (number, required) – e.g. 10.0 for $10, 0.2 for 20%\n- validFrom / validUntil (ISO datetime strings, optional)\n- usageLimit (number, optional)\n- applicablePlans (array of plan IDs or null, optional)\n- chargebeeCouponId (string, optional but recommended) – existing Chargebee coupon ID for PC 2.0"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"New Year Special\",\n  \"description\": \"20% off for new subscribers\",\n  \"code\": \"NY2025\",\n  \"discountType\": \"percentage\",\n  \"discountValue\": 0.20,\n  \"validFrom\": \"2025-01-01T00:00:00Z\",\n  \"validUntil\": \"2025-01-31T23:59:59Z\",\n  \"usageLimit\": 1000,\n  \"applicablePlans\": null,\n  \"chargebeeCouponId\": \"NY2025\"\n}"
+                },
+                "url": {
+                  "raw": "{{SUPABASE_URL}}/functions/v1/create-campaign",
+                  "host": ["{{SUPABASE_URL}}"],
+                  "path": ["functions", "v1", "create-campaign"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Campaign created successfully (no Chargebee API call)\",\n  \"campaign\": {\n    \"id\": \"uuid-string\",\n    \"name\": \"New Year Special\",\n    \"code\": \"NY2025\",\n    \"discount_type\": \"percentage\",\n    \"discount_value\": 0.20,\n    \"chargebee_coupon_id\": \"NY2025\",\n    \"is_active\": true,\n    \"valid_from\": \"2025-01-01T00:00:00Z\",\n    \"valid_until\": \"2025-01-31T23:59:59Z\",\n    \"usage_limit\": 1000,\n    \"used_count\": 0\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Fixed Amount Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}",
+                "description": "Admin authentication token required"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Welcome Discount\",\n  \"description\": \"$10 off first month\",\n  \"code\": \"WELCOME10\",\n  \"discountType\": \"fixed\",\n  \"discountValue\": 10.00,\n  \"validFrom\": \"2025-01-01T00:00:00Z\",\n  \"validUntil\": \"2025-12-31T23:59:59Z\",\n  \"usageLimit\": null,\n  \"applicablePlans\": [\"basic-plan-id\", \"premium-plan-id\"]\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/create-campaign",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "create-campaign"]
+            },
+            "description": "Create a fixed amount discount campaign. Set applicablePlans to array of plan IDs or null for all plans."
           }
         }
       ]

@@ -31,6 +31,7 @@ Deno.serve(async (req) => {
       userId,
       carePreference,
       mattersMost,
+      ageRanges,
       fundingFrequency,
       lovedOnesCountries,
       lovedOnesCities,
@@ -49,10 +50,11 @@ Deno.serve(async (req) => {
     const { error: onboardingError } = await admin.from('user_onboarding').upsert({
       user_id: userId,
       care_preference: carePreference,
+      matters_most: mattersMost,
+      age_ranges: ageRanges,
       funding_frequency: fundingFrequency,
       payment_frequency: paymentFrequency,
-      number_of_loved_ones: numberOfLovedOnes,
-      matters_most: mattersMost
+      number_of_loved_ones: numberOfLovedOnes
     })
 
     if (onboardingError) {

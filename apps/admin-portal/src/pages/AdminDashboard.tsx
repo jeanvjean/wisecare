@@ -63,6 +63,12 @@ function AdminDashboard() {
                 User Management
               </button>
               <button
+                onClick={() => window.location.href = '/campaigns'}
+                className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+              >
+                Campaign Management
+              </button>
+              <button
                 onClick={handleSignOut}
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
               >

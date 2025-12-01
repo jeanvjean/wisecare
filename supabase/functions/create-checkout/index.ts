@@ -1,6 +1,19 @@
-// @ts-nocheck
+ // @ts-nocheck
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
+const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+
 const CHARGEBEE_SITE = Deno.env.get('CHARGEBEE_SITE') || 'enyata-test'
 const CHARGEBEE_API_KEY = Deno.env.get('CHARGEBEE_API_KEY') || 'test_WDOffoOLVp4VmsweeaBcdSlcureDbvGoAF'
+
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
+  }
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -25,9 +38,76 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { itemPriceId, itemId, customerId, customerEmail, firstName, lastName, redirectUrl, quantity, quantityDecimal } = await req.json()
+    const { itemPriceId, itemId, customerId, customerEmail, firstName, lastName, redirectUrl, quantity, quantityDecimal, promoCode, validateOnly } = await req.json()
 
-    // Determine the correct Product Catalog 2.0 item_price_id
+    const admin = createClient(SUPABASE_URL, SERVICE_ROLE)
+
+    // If we're only validating a promo code from the UI, avoid ANY Chargebee calls.
+    // This prevents 404s like "item_price with id test is not found" when we pass a dummy itemPriceId.
+    if (validateOnly && promoCode) {
+      try {
+        const { data: campaign, error: campaignError } = await admin
+          .from('campaigns')
+          .select('*')
+          .eq('code', promoCode)
+          .eq('is_active', true)
+          .single()
+
+        if (campaignError || !campaign) {
+          return new Response(JSON.stringify({ error: 'Invalid promo code' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+          })
+        }
+
+        // Check validity dates
+        const now = new Date()
+        if (campaign.valid_from && new Date(campaign.valid_from) > now) {
+          return new Response(JSON.stringify({ error: 'Promo code not yet valid' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+          })
+        }
+        if (campaign.valid_until && new Date(campaign.valid_until) < now) {
+          return new Response(JSON.stringify({ error: 'Promo code has expired' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+          })
+        }
+
+        // Check usage limit
+        if (campaign.usage_limit && campaign.used_count >= campaign.usage_limit) {
+          return new Response(JSON.stringify({ error: 'Promo code usage limit exceeded' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+          })
+        }
+
+        // For validateOnly, we do NOT:
+        // - check applicable_plans
+        // - hit Chargebee item_prices
+        // We just return discount metadata for the UI.
+        return new Response(JSON.stringify({
+          valid: true,
+          discountInfo: {
+            code: campaign.code,
+            type: campaign.discount_type,
+            value: campaign.discount_value,
+            name: campaign.name
+          }
+        }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+        })
+      } catch (promoError) {
+        console.error('Promo code validateOnly error:', promoError)
+        return new Response(JSON.stringify({ error: 'Error validating promo code' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+        })
+      }
+    }
+
+    // Determine the correct Product Catalog 2.0 item_price_id for REAL checkout
     let priceId = itemPriceId || null
 
     // If only itemId is provided, try to resolve its first active item_price_id
@@ -137,7 +217,88 @@ Deno.serve(async (req) => {
       })
     }
 
-    console.log('Creating hosted page for:', { itemPriceId: priceId, customerId, customerEmail })
+    // Validate promo code if provided (REAL checkout – we already handled validateOnly above)
+    let couponId = null
+    if (promoCode) {
+      try {
+        const { data: campaign, error: campaignError } = await admin
+          .from('campaigns')
+          .select('*')
+          .eq('code', promoCode)
+          .eq('is_active', true)
+          .single()
+
+        if (campaignError || !campaign) {
+          return new Response(JSON.stringify({ error: 'Invalid promo code' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+          })
+        }
+
+        // Check validity dates
+        const now = new Date()
+        if (campaign.valid_from && new Date(campaign.valid_from) > now) {
+          return new Response(JSON.stringify({ error: 'Promo code not yet valid' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+          })
+        }
+        if (campaign.valid_until && new Date(campaign.valid_until) < now) {
+          return new Response(JSON.stringify({ error: 'Promo code has expired' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+          })
+        }
+
+        // Check usage limit
+        if (campaign.usage_limit && campaign.used_count >= campaign.usage_limit) {
+          return new Response(JSON.stringify({ error: 'Promo code usage limit exceeded' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+          })
+        }
+
+        // Check if campaign applies to this plan
+        if (campaign.applicable_plans && campaign.applicable_plans.length > 0) {
+          // We need to get the plan ID from the item_price
+          const planDetailRes = await fetch(`https://${CHARGEBEE_SITE}.chargebee.com/api/v2/item_prices/${encodeURIComponent(priceId)}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Basic ${btoa(CHARGEBEE_API_KEY + ':')}`,
+              'Accept': 'application/json'
+            }
+          })
+
+          if (planDetailRes.ok) {
+            const planDetail = await planDetailRes.json()
+            const planId = planDetail.item_price?.item_id
+            if (planId && !campaign.applicable_plans.includes(planId)) {
+              return new Response(JSON.stringify({ error: 'Promo code not applicable to this plan' }), {
+                status: 400,
+                headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+              })
+            }
+          }
+        }
+
+        couponId = campaign.chargebee_coupon_id
+
+        // Increment usage count now that the promo is actually being used
+        await admin
+          .from('campaigns')
+          .update({ used_count: campaign.used_count + 1 })
+          .eq('id', campaign.id)
+
+      } catch (promoError) {
+        console.error('Promo code validation error:', promoError)
+        return new Response(JSON.stringify({ error: 'Error validating promo code' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+        })
+      }
+    }
+
+    console.log('Creating hosted page for:', { itemPriceId: priceId, customerId, customerEmail, couponId })
 
     // Create hosted page for Product Catalog 2.0 subscription checkout
     // Resolve checkout quantity (Chargebee supports quantity and quantity_in_decimal in PC 2.0)
@@ -163,6 +324,11 @@ Deno.serve(async (req) => {
     if (customerEmail) params.set('customer[email]', customerEmail)
     if (firstName) params.set('customer[first_name]', firstName)
     if (lastName) params.set('customer[last_name]', lastName)
+
+    // Add coupon if promo code was valid
+    if (couponId) {
+      params.set('coupon_ids[0]', couponId)
+    }
     // Always provide redirect and cancel URLs. Chargebee validates these and the domain must be allowed.
     // We force both to use the request origin to avoid invalid/relative URLs being sent from the client.
     const requestOrigin = req.headers.get('origin') || null
@@ -222,6 +388,7 @@ Deno.serve(async (req) => {
         customer_email_redacted: customerEmail ? `${customerEmail.slice(0,3)}***@***` : undefined,
         customer_first_name_present: !!firstName,
         customer_last_name_present: !!lastName,
+        coupon_id: couponId,
         redirect_url: finalRedirect,
         cancel_url: finalCancel
       }

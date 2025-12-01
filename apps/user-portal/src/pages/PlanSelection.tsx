@@ -9,6 +9,9 @@ function PlanSelection() {
   const { user } = useAuthStore()
   const [loading, setLoading] = useState<string | null>(null)
   const [currency, setCurrency] = useState<string>('USD')
+  const [promoCode, setPromoCode] = useState('')
+  const [appliedDiscount, setAppliedDiscount] = useState<any>(null)
+  const [promoError, setPromoError] = useState('')
   
   // Support coming back to a page after checkout
   const params = new URLSearchParams(window.location.search)
@@ -171,6 +174,53 @@ function PlanSelection() {
     staleTime: 60 * 1000
   })
 
+  const handleApplyPromoCode = async () => {
+    if (!promoCode.trim()) {
+      setPromoError('Please enter a promo code')
+      return
+    }
+
+    setPromoError('')
+    try {
+      // Validate promo code by making a test call to create-checkout with promoCode
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) throw new Error('No authentication token')
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY as string
+        },
+        body: JSON.stringify({
+          itemPriceId: 'test', // dummy value for validation
+          promoCode: promoCode.trim(),
+          validateOnly: true // We'll add this flag to create-checkout
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Invalid promo code')
+      }
+
+      const data = await response.json()
+      setAppliedDiscount(data.discountInfo || { code: promoCode, valid: true })
+      setPromoError('')
+    } catch (error: any) {
+      console.error('Promo code validation error:', error)
+      setPromoError(error.message || 'Invalid promo code')
+      setAppliedDiscount(null)
+    }
+  }
+
+  const handleRemovePromoCode = () => {
+    setPromoCode('')
+    setAppliedDiscount(null)
+    setPromoError('')
+  }
+
   const handleSelectPlan = async (itemPriceId: string) => {
     if (!user) return
 
@@ -205,7 +255,8 @@ function PlanSelection() {
           customerEmail: user.email,
           firstName: profile.first_name,
           lastName: profile.last_name,
-          quantity: Math.max(1, dependentsCount)
+          quantity: Math.max(1, dependentsCount),
+          promoCode: appliedDiscount ? promoCode : undefined
         })
       })
 
@@ -306,6 +357,56 @@ function PlanSelection() {
           <p className="text-xl text-gray-600">Select the plan that best fits your healthcare needs</p>
         </div>
 
+        {/* Promo Code Section */}
+        <div className="max-w-md mx-auto mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Have a Promo Code?</h3>
+            {!appliedDiscount ? (
+              <div className="space-y-3">
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                    placeholder="Enter promo code"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 uppercase"
+                    onKeyPress={(e) => e.key === 'Enter' && handleApplyPromoCode()}
+                  />
+                  <button
+                    onClick={handleApplyPromoCode}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  >
+                    Apply
+                  </button>
+                </div>
+                {promoError && (
+                  <p className="text-red-600 text-sm">{promoError}</p>
+                )}
+              </div>
+            ) : (
+              <div className="bg-green-50 border border-green-200 rounded p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-green-800 font-medium">Promo code applied!</p>
+                    <p className="text-green-600 text-sm">
+                      {appliedDiscount.name} - {appliedDiscount.type === 'percentage'
+                        ? `${appliedDiscount.value * 100}% off`
+                        : `$${appliedDiscount.value} off`
+                      }
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleRemovePromoCode}
+                    className="text-red-600 hover:text-red-800 text-sm underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {currentSub?.item_price_id && (
           <div className="mb-8 bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded">
             <div className="flex items-center justify-between">
@@ -334,9 +435,33 @@ function PlanSelection() {
                     <span className="ml-2 inline-block px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-700 rounded">Current</span>
                   )}
                 </h3>
-                <div className="text-3xl font-bold text-blue-600 mb-4">
-                  {new Intl.NumberFormat(navigator.language, { style: 'currency', currency: plan.currency }).format(plan.computed_total || plan.price)}
-                  <span className="text-lg font-normal text-gray-600">/{plan.period_unit.toLowerCase()}</span>
+                <div className="mb-4">
+                  {appliedDiscount ? (
+                    <div>
+                      <div className="text-lg text-gray-500 line-through">
+                        {new Intl.NumberFormat(navigator.language, { style: 'currency', currency: plan.currency }).format(plan.computed_total || plan.price)}
+                      </div>
+                      <div className="text-3xl font-bold text-green-600">
+                        {new Intl.NumberFormat(navigator.language, { style: 'currency', currency: plan.currency }).format(
+                          appliedDiscount.type === 'percentage'
+                            ? (plan.computed_total || plan.price) * (1 - appliedDiscount.value)
+                            : Math.max(0, (plan.computed_total || plan.price) - appliedDiscount.value)
+                        )}
+                        <span className="text-lg font-normal text-gray-600">/{plan.period_unit.toLowerCase()}</span>
+                      </div>
+                      <div className="text-sm text-green-600 font-medium">
+                        {appliedDiscount.type === 'percentage'
+                          ? `${appliedDiscount.value * 100}% discount applied`
+                          : `$${appliedDiscount.value} discount applied`
+                        }
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-3xl font-bold text-blue-600">
+                      {new Intl.NumberFormat(navigator.language, { style: 'currency', currency: plan.currency }).format(plan.computed_total || plan.price)}
+                      <span className="text-lg font-normal text-gray-600">/{plan.period_unit.toLowerCase()}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="text-gray-600 mb-6">
                   {plan.description || 'Comprehensive healthcare coverage for you and your family.'}

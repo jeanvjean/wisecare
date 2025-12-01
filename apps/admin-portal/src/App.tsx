@@ -6,6 +6,7 @@ import { supabase } from './lib/supabase'
 import AdminLogin from './pages/auth/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import UserManagement from './pages/UserManagement'
+import CampaignManagement from './pages/CampaignManagement'
 
 const queryClient = new QueryClient()
 
@@ -49,6 +50,7 @@ function App() {
         <Routes>
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/users" element={<UserManagement />} />
+          <Route path="/campaigns" element={<CampaignManagement />} />
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
       </BrowserRouter>

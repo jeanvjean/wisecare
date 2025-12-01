@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -10,6 +10,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 const onboardingSchema = z.object({
   carePreference: z.string(),
   mattersMost: z.array(z.string()),
+  ageRanges: z.array(z.string()),
   fundingFrequency: z.string(),
   lovedOnesCountries: z.array(z.string()),
   lovedOnesCities: z.array(z.string()),
@@ -22,6 +23,7 @@ type OnboardingForm = z.infer<typeof onboardingSchema>
 const steps = [
   'Care Preference',
   'What Matters Most',
+  'Age Ranges',
   'Healthcare Funding Frequency',
   'Loved Ones\' Countries',
   'Loved Ones\' Cities',
@@ -29,10 +31,18 @@ const steps = [
   'Payment Frequency Preference'
 ]
 
+const ageRangeOptions = [
+  'Under 18 (Children and Teenagers)',
+  '18 - 60 (Adult and dependents)',
+  'Over 60 (Parents and senior)',
+  'All of the above (Mixed Family members)'
+]
+
 function Onboarding() {
   const [currentStep, setCurrentStep] = useState(0)
   const [searchCountry, setSearchCountry] = useState('')
   const [searchCity, setSearchCity] = useState('')
+  const [ageRangesSelected, setAgeRangesSelected] = useState<string[]>([])
   const { user, signOut } = useAuthStore()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -43,6 +53,7 @@ function Onboarding() {
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
       mattersMost: [],
+      ageRanges: [],
       lovedOnesCountries: [],
       lovedOnesCities: []
     }
@@ -179,6 +190,34 @@ function Onboarding() {
 
   const watchedValues = watch()
 
+  // Sync ageRangesSelected with form
+  React.useEffect(() => {
+    const current = watch('ageRanges') || []
+    setAgeRangesSelected(current)
+  }, [watch('ageRanges')])
+
+  const handleAgeRangeChange = (option: string, checked: boolean) => {
+    let newSelected = [...ageRangesSelected]
+    if (option === 'All of the above (Mixed Family members)') {
+      if (checked) {
+        newSelected = ageRangeOptions.slice(0, 3) // All except "All"
+      } else {
+        newSelected = []
+      }
+    } else {
+      if (checked) {
+        newSelected.push(option)
+      } else {
+        newSelected = newSelected.filter(r => r !== option)
+        // If "All" was checked and we unchecked one, uncheck "All"
+        if (newSelected.includes('All of the above (Mixed Family members)')) {
+          newSelected = newSelected.filter(r => r !== 'All of the above (Mixed Family members)')
+        }
+      }
+    }
+    setValue('ageRanges', newSelected)
+  }
+
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1)
@@ -202,10 +241,11 @@ function Onboarding() {
       const onboardingData = {
         userId: user.id,
         carePreference: data.carePreference,
+        mattersMost: data.mattersMost,
+        ageRanges: data.ageRanges,
         fundingFrequency: data.fundingFrequency,
         paymentFrequency: data.paymentFrequency,
         numberOfLovedOnes: data.numberOfLovedOnes,
-        mattersMost: data.mattersMost,
         lovedOnesCountries: data.lovedOnesCountries,
         lovedOnesCities: data.lovedOnesCities,
       }
@@ -260,10 +300,11 @@ function Onboarding() {
       await supabase.from('user_onboarding').upsert({
         user_id: user.id,
         care_preference: currentData.carePreference,
+        matters_most: currentData.mattersMost,
+        age_ranges: currentData.ageRanges,
         funding_frequency: currentData.fundingFrequency,
         payment_frequency: currentData.paymentFrequency,
-        number_of_loved_ones: currentData.numberOfLovedOnes,
-        matters_most: currentData.mattersMost
+        number_of_loved_ones: currentData.numberOfLovedOnes
       })
 
       // Redirect to dashboard - user can return to onboarding later
@@ -326,6 +367,25 @@ function Onboarding() {
       case 2:
         return (
           <div>
+            <h3 className="text-lg font-medium mb-4">Select the age ranges of your loved ones</h3>
+            <div className="space-y-2">
+              {ageRangeOptions.map(option => (
+                <label key={option} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={ageRangesSelected.includes(option)}
+                    onChange={(e) => handleAgeRangeChange(option, e.target.checked)}
+                    className="mr-2"
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+          </div>
+        )
+      case 3:
+        return (
+          <div>
             <h3 className="text-lg font-medium mb-4">How often would you like to fund healthcare?</h3>
             <div className="space-y-2">
               {['Monthly', 'Quarterly', 'Bi-annually', 'Annually'].map(option => (
@@ -342,7 +402,7 @@ function Onboarding() {
             </div>
           </div>
         )
-      case 3:
+      case 4:
         const filteredCountries = countries.filter((country: string) =>
           country.toLowerCase().includes(searchCountry.toLowerCase())
         )
@@ -378,7 +438,7 @@ function Onboarding() {
             </div>
           </div>
         )
-      case 4:
+      case 5:
         const filteredCities = cities.filter((city: string) =>
           city.toLowerCase().includes(searchCity.toLowerCase())
         )
@@ -422,7 +482,7 @@ function Onboarding() {
             )}
           </div>
         )
-      case 5:
+      case 6:
         return (
           <div>
             <h3 className="text-lg font-medium mb-4">How many loved ones do you want to cover?</h3>
@@ -445,7 +505,7 @@ function Onboarding() {
             </div>
           </div>
         )
-      case 6:
+      case 7:
         return (
           <div>
             <h3 className="text-lg font-medium mb-4">Preferred payment frequency</h3>
