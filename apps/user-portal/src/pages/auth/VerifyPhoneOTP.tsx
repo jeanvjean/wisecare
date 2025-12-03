@@ -30,7 +30,7 @@ function VerifyPhoneOTP() {
 
   // Get phone number from URL params
   const phoneParam = searchParams.get('phone') || ''
-  const methodParam = searchParams.get('method') as 'sms' | 'whatsapp' || 'sms'
+  const methodParam = searchParams.get('deliveryMethod') as 'sms' | 'whatsapp' || searchParams.get('method') as 'sms' | 'whatsapp' || 'sms'
 
   useEffect(() => {
     if (phoneParam) {

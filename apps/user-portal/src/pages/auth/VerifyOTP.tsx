@@ -29,8 +29,18 @@ function VerifyOTP() {
     try {
       setError(null)
       await verifyOTP(data.email, data.otp)
-      // On success, redirect to add phone number step
-      navigate(`/add-phone-number?email=${encodeURIComponent(data.email)}`)
+      // On success, check if phone number was provided during signup
+      // If phone number exists, redirect to phone verification
+      // Otherwise, redirect to add phone number step
+      const phoneNumber = searchParams.get('phone')
+      if (phoneNumber) {
+        // Redirect to phone verification with phone number and delivery method
+        const deliveryMethod = searchParams.get('deliveryMethod') || 'sms'
+        navigate(`/verify-phone-otp?email=${encodeURIComponent(data.email)}&phone=${encodeURIComponent(phoneNumber)}&deliveryMethod=${deliveryMethod}`)
+      } else {
+        // No phone number provided, redirect to add phone number
+        navigate(`/add-phone-number?email=${encodeURIComponent(data.email)}`)
+      }
     } catch (err: any) {
       setError(err.message)
     }

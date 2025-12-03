@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Send OTP for phone verification via SMS or WhatsApp using Twilio
 // POST /functions/v1/send-phone-otp
-// Body: { "phoneNumber": "+1234567890", "deliveryMethod": "sms" | "whatsapp", "country": "nigeria" }
+// Body: { "phoneNumber": "+1234567890", "deliveryMethod": "sms" | "whatsapp", "country": "nigeria", "email": "user@example.com" }
 // Response: { "message": "OTP sent via SMS", "otp_id": "...", "delivery_method": "sms" }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -105,6 +105,32 @@ Deno.serve(async (req) => {
     let phoneNumber = body?.phoneNumber?.trim()
     const deliveryMethod = body?.deliveryMethod || 'sms' // Default to SMS, can be 'sms' or 'whatsapp'
     const country = body?.country?.toLowerCase() || 'united_kingdom' // Default to United Kingdom
+    const email = body?.email?.trim()
+
+    // If no phone number provided, try to fetch from user profile using email
+    if (!phoneNumber && email) {
+      const { data: users, error: listError } = await admin.auth.admin.listUsers()
+      if (listError) throw listError
+
+      const user = users.users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+      if (user) {
+        // Fetch phone number from profiles table
+        const { data: profile, error: profileError } = await admin
+          .from('profiles')
+          .select('phone_number, delivery_method_preference')
+          .eq('id', user.id)
+          .single();
+
+        if (!profileError && profile?.phone_number) {
+          phoneNumber = profile.phone_number;
+          // Use delivery method from profile if available, otherwise use request or default
+          const profileDeliveryMethod = profile.delivery_method_preference;
+          if (profileDeliveryMethod && ['sms', 'whatsapp'].includes(profileDeliveryMethod)) {
+            deliveryMethod = profileDeliveryMethod;
+          }
+        }
+      }
+    }
 
     if (!phoneNumber) {
       return new Response(JSON.stringify({ error: 'Phone number is required' }), {
@@ -155,16 +181,8 @@ Deno.serve(async (req) => {
           headers: { 'Content-Type': 'application/json', ...corsHeaders(req) }
         })
       }
-    } else {
+    } else if (email) {
       // Session-less flow: require email to identify the user and store OTP in user metadata
-      const email = body?.email?.trim()
-      if (!email) {
-        return new Response(JSON.stringify({ error: 'Email is required when not authenticated' }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(req) }
-        })
-      }
-
       // Find user by email via admin
       const { data: list, error: listError } = await admin.auth.admin.listUsers()
       if (listError) {

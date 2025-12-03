@@ -1,7 +1,7 @@
 // @ts-nocheck
 // User signup via edge function
 // POST /functions/v1/signup
-// Body: { "email": "user@example.com", "password": "password", "firstName": "John", "lastName": "Doe", "country": "UK" }
+// Body: { "email": "user@example.com", "password": "password", "firstName": "John", "lastName": "Doe", "country": "UK", "phoneNumber": "+1234567890", "deliveryMethod": "sms" }
 // Response: { "message": "User created, OTP sent", "otp_id": "..." }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
   try {
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE)
     const body = await req.json()
-    const { email, password, firstName, lastName, country } = body
+    const { email, password, firstName, lastName, country, phoneNumber, deliveryMethod } = body
     let { resendOnly } = body
 
     if (!email) {
@@ -103,7 +103,9 @@ Deno.serve(async (req) => {
         user_metadata: {
           first_name: firstName,
           last_name: lastName,
-          country
+          country,
+          ...(phoneNumber && { phone_number: phoneNumber }),
+          ...(deliveryMethod && { delivery_method_preference: deliveryMethod })
         },
         email_confirm: false // We'll send our own OTP
       })
@@ -119,6 +121,8 @@ Deno.serve(async (req) => {
           first_name: firstName,
           last_name: lastName,
           country: country,
+          ...(phoneNumber && { phone_number: phoneNumber }),
+          ...(deliveryMethod && { delivery_method_preference: deliveryMethod })
         })
         .select('unique_id')
         .single();
@@ -194,7 +198,7 @@ Deno.serve(async (req) => {
                       </p>
 
                       <p style="font-size: 16px; color: #000000; font-weight: 400; line-height: 40px;">
-                      It's valid for the next 5 minutes. 
+                      It's valid for the next 5 minutes.
                       </p>
                       </p>
                           <p style="font-size: 16px; color: #000000; font-weight: 400; line-height: 40px;">
@@ -202,16 +206,17 @@ Deno.serve(async (req) => {
                       </p>
                       </p>
                           <p style="font-size: 16px; color: #000000; font-weight: 400; line-height: 40px;">
-                      Caring for your loved ones starts here. 💙 
+                      Caring for your loved ones starts here. 💙
                       </p>
 
                       <div style="background-color: #000000; padding: 49px 38px; margin-top: 91px; text-align: center; color: white; font-size: 13px; height: 270px; display: flex;">
                           <div style="width: 650px; margin: auto;">
 
                           <p>Care for your loved ones, from anywhere in the world.</p>
-                          <p >
-                              <a href="http://" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: white;">🌍Visit Website</a>      |   
-                              <a href="http://" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: white;">✉️ Get Support</a>  </p>
+                          <p>
+                              <a href="http://" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: white;">🌍Visit Website</a>
+                              <a href="http://" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: white;">✉️ Get Support</a>
+                              </p>
                               <p style="margin-top: 15px; margin-bottom: 15px;">You're receiving this email because you have a WiseCare account or were added as a beneficiary.If you'd prefer not to receive these notifications, you can [unsubscribe here].</p>
                               <p>Registered in England & Wales | Company No. 16613659</p>
                               <table align="center" cellpadding="0" cellspacing="0" role="presentation" style="margin:auto; margin-top:22px;">
@@ -265,7 +270,9 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({
       message: resendOnly ? 'OTP sent to email' : 'User created, OTP sent to email',
-      otp_id: otpId
+      otp_id: otpId,
+      ...(phoneNumber && { phoneNumber: phoneNumber }),
+      ...(deliveryMethod && { deliveryMethod: deliveryMethod })
     }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders() }
     })

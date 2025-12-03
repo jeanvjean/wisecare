@@ -5,7 +5,7 @@ interface AuthState {
   user: any
   loading: boolean
   setUser: (user: any) => void
-  signUp: (data: { firstName: string; lastName: string; country: string; email: string; password: string }) => Promise<void>
+  signUp: (data: { firstName: string; lastName: string; country: string; email: string; password: string; phoneNumber: string; deliveryMethod: 'sms' | 'whatsapp' }) => Promise<void>
   signIn: (email: string, password: string) => Promise<{ needsEmailVerification: boolean; needsPhoneVerification: boolean; needsOnboarding: boolean; needsPlanSelection: boolean }>
   signInWithWebAuthn: (email: string) => Promise<void>
   registerWebAuthn: () => Promise<void>
@@ -34,7 +34,9 @@ export const useAuthStore = create<AuthState>((set) => ({
           password: data.password,
           firstName: data.firstName,
           lastName: data.lastName,
-          country: data.country
+          country: data.country,
+          phoneNumber: data.phoneNumber,
+          deliveryMethod: data.deliveryMethod
         })
       })
       if (!response.ok) {

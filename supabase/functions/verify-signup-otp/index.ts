@@ -2,7 +2,7 @@
 // Verify signup OTP
 // POST /functions/v1/verify-signup-otp
 // Body: { "email": "user@example.com", "otp": "123456" }
-// Response: { "message": "Email verified successfully" }
+// Response: { "message": "Email verified successfully", "phoneVerificationTriggered": true, "phoneNumber": "+1234567890" }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -86,7 +86,55 @@ Deno.serve(async (req) => {
 
     if (updateError) throw updateError
 
-    return new Response(JSON.stringify({ message: 'Email verified successfully' }), {
+    // Check if phone number exists in user profile
+    const { data: profile, error: profileError } = await admin
+      .from('profiles')
+      .select('phone_number, delivery_method_preference')
+      .eq('id', user.id)
+      .single();
+
+    let phoneVerificationTriggered = false;
+    let phoneNumber = null;
+    let deliveryMethod = 'sms';
+
+    if (!profileError && profile?.phone_number) {
+      phoneNumber = profile.phone_number;
+      deliveryMethod = profile.delivery_method_preference || 'sms';
+      phoneVerificationTriggered = true;
+
+      // Trigger phone OTP sending
+      try {
+        // Call send-phone-otp function internally
+        const sendPhoneOtpUrl = `${SUPABASE_URL}/functions/v1/send-phone-otp`;
+        const sendPhoneOtpResponse = await fetch(sendPhoneOtpUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SERVICE_ROLE}`
+          },
+          body: JSON.stringify({
+            phoneNumber: phoneNumber,
+            deliveryMethod: deliveryMethod,
+            email: email
+          })
+        });
+
+        if (!sendPhoneOtpResponse.ok) {
+          console.error('Failed to trigger phone OTP:', await sendPhoneOtpResponse.text());
+          phoneVerificationTriggered = false;
+        }
+      } catch (phoneOtpError) {
+        console.error('Error triggering phone OTP:', phoneOtpError);
+        phoneVerificationTriggered = false;
+      }
+    }
+
+    return new Response(JSON.stringify({
+      message: 'Email verified successfully',
+      phoneVerificationTriggered: phoneVerificationTriggered,
+      ...(phoneNumber && { phoneNumber: phoneNumber }),
+      ...(deliveryMethod && { deliveryMethod: deliveryMethod })
+    }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders() }
     })
 

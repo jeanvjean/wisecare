@@ -5,18 +5,42 @@ import { z } from 'zod'
 import { useAuthStore } from '../../store/auth'
 import { Link, useNavigate } from 'react-router-dom'
 
-const signupSchema = z.object({
+// Step 1: Country selection schema
+const countrySchema = z.object({
+  country: z.string().min(1, 'Country is required'),
+})
+
+// Step 2: Combined user info schema
+const userInfoSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  country: z.string().min(1, 'Country is required'),
   email: z.string().email('Invalid email address'),
+  phoneNumber: z.string().min(1, 'Phone number is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string()
+  confirmPassword: z.string(),
+  deliveryMethod: z.enum(['sms', 'whatsapp']).default('sms')
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 })
 
+// Combined schema for form validation
+const signupSchema = z.object({
+  country: z.string().min(1, 'Country is required'),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Invalid email address'),
+  phoneNumber: z.string().min(1, 'Phone number is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string(),
+  deliveryMethod: z.enum(['sms', 'whatsapp']).default('sms')
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+})
+
+type CountryForm = z.infer<typeof countrySchema>
+type UserInfoForm = z.infer<typeof userInfoSchema>
 type SignupForm = z.infer<typeof signupSchema>
 
 function Signup() {
@@ -27,13 +51,43 @@ function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([])
   const [countriesLoading, setCountriesLoading] = useState(true)
+  const [formData, setFormData] = useState<SignupForm>({
+    country: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    password: '',
+    confirmPassword: '',
+    deliveryMethod: 'sms'
+  })
   const navigate = useNavigate()
 
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<SignupForm>({
-    resolver: zodResolver(signupSchema)
+  // Form for step 1 (country selection)
+  const countryForm = useForm<CountryForm>({
+    resolver: zodResolver(countrySchema),
+    defaultValues: {
+      country: formData.country
+    }
   })
 
-  const watchedFields = watch()
+  // Form for step 2 (user info)
+  const userInfoForm = useForm<UserInfoForm>({
+    resolver: zodResolver(userInfoSchema),
+    defaultValues: {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      deliveryMethod: formData.deliveryMethod
+    }
+  })
+
+  const { watch: watchCountry } = countryForm
+
+  const watchedCountry = watchCountry()
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -117,8 +171,9 @@ function Signup() {
   }, [])
 
   const nextStep = () => {
-    if (step === 1 && watchedFields.firstName && watchedFields.lastName && watchedFields.country) {
+    if (step === 1 && watchedCountry.country) {
       setStep(2)
+      setFormData(prev => ({ ...prev, country: watchedCountry.country }))
     }
   }
 
@@ -128,18 +183,27 @@ function Signup() {
     }
   }
 
-  const onSubmit = async (data: SignupForm) => {
+  const onSubmit = async (data: UserInfoForm) => {
     try {
       setError(null)
+      const completeFormData = {
+        ...formData,
+        ...data,
+        country: formData.country
+      }
+
       await signUp({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        country: data.country,
-        email: data.email,
-        password: data.password
+        firstName: completeFormData.firstName,
+        lastName: completeFormData.lastName,
+        country: completeFormData.country,
+        email: completeFormData.email,
+        phoneNumber: completeFormData.phoneNumber,
+        password: completeFormData.password,
+        deliveryMethod: completeFormData.deliveryMethod
       })
-      // Redirect to OTP verification page
-      navigate(`/verify-otp?email=${encodeURIComponent(data.email)}`)
+
+      // Redirect to OTP verification page with phone number
+      navigate(`/verify-otp?email=${encodeURIComponent(completeFormData.email)}&phone=${encodeURIComponent(completeFormData.phoneNumber)}`)
     } catch (err: any) {
       setError(err.message)
     }
@@ -153,47 +217,21 @@ function Signup() {
           <p className="text-center text-sm text-gray-600 mt-2">Step {step} of 2</p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
 
-          {step === 1 && (
+        {step === 1 && (
+          <form className="mt-8 space-y-6">
             <div className="space-y-4">
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                  First Name
-                </label>
-                <input
-                  {...register('firstName')}
-                  type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-                {errors.firstName && (
-                  <p className="mt-1 text-sm text-red-600">{errors.firstName.message}</p>
-                )}
-              </div>
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                  Last Name
-                </label>
-                <input
-                  {...register('lastName')}
-                  type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-                {errors.lastName && (
-                  <p className="mt-1 text-sm text-red-600">{errors.lastName.message}</p>
-                )}
-              </div>
               <div>
                 <label htmlFor="country" className="block text-sm font-medium text-gray-700">
                   Country
                 </label>
                 <input
-                  {...register('country')}
+                  {...countryForm.register('country')}
                   type="text"
                   list="countries-list"
                   disabled={countriesLoading}
@@ -205,77 +243,164 @@ function Signup() {
                     <option key={country.value} value={country.value} />
                   ))}
                 </datalist>
-                {errors.country && (
-                  <p className="mt-1 text-sm text-red-600">{errors.country.message}</p>
+                {countryForm.formState.errors.country && (
+                  <p className="mt-1 text-sm text-red-600">{countryForm.formState.errors.country.message}</p>
                 )}
               </div>
             </div>
-          )}
 
-          {step === 2 && (
+            <div className="flex justify-between">
+              <button
+                type="button"
+                onClick={nextStep}
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                disabled={!watchedCountry.country || countriesLoading}
+              >
+                Continue
+              </button>
+            </div>
+          </form>
+        )}
+
+        {step === 2 && (
+          <form className="mt-8 space-y-6" onSubmit={userInfoForm.handleSubmit(onSubmit)}>
             <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                    First Name
+                  </label>
+                  <input
+                    {...userInfoForm.register('firstName')}
+                    type="text"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  {userInfoForm.formState.errors.firstName && (
+                    <p className="mt-1 text-sm text-red-600">{userInfoForm.formState.errors.firstName.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                    Last Name
+                  </label>
+                  <input
+                    {...userInfoForm.register('lastName')}
+                    type="text"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  {userInfoForm.formState.errors.lastName && (
+                    <p className="mt-1 text-sm text-red-600">{userInfoForm.formState.errors.lastName.message}</p>
+                  )}
+                </div>
+              </div>
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email address
                 </label>
                 <input
-                  {...register('email')}
+                  {...userInfoForm.register('email')}
                   type="email"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                {userInfoForm.formState.errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{userInfoForm.formState.errors.email.message}</p>
                 )}
               </div>
+
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
+                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+                  Phone Number
                 </label>
-                <div className="relative">
-                  <input
-                    {...register('password')}
-                    type={showPassword ? 'text' : 'password'}
-                    className="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                  >
-                    {showPassword ? 'Hide' : 'Show'}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <input
+                  {...userInfoForm.register('phoneNumber')}
+                  type="tel"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder={`Phone number (${formData.country})`}
+                />
+                {userInfoForm.formState.errors.phoneNumber && (
+                  <p className="mt-1 text-sm text-red-600">{userInfoForm.formState.errors.phoneNumber.message}</p>
                 )}
               </div>
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <input
-                    {...register('confirmPassword')}
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    className="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                  >
-                    {showConfirmPassword ? 'Hide' : 'Show'}
-                  </button>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      {...userInfoForm.register('password')}
+                      type={showPassword ? 'text' : 'password'}
+                      className="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                    >
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                  {userInfoForm.formState.errors.password && (
+                    <p className="mt-1 text-sm text-red-600">{userInfoForm.formState.errors.password.message}</p>
+                  )}
                 </div>
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      {...userInfoForm.register('confirmPassword')}
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      className="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                    >
+                      {showConfirmPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                  {userInfoForm.formState.errors.confirmPassword && (
+                    <p className="mt-1 text-sm text-red-600">{userInfoForm.formState.errors.confirmPassword.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Delivery Method
+                </label>
+                <div className="flex space-x-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      {...userInfoForm.register('deliveryMethod')}
+                      value="sms"
+                      className="mr-2"
+                    />
+                    <span>SMS</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      {...userInfoForm.register('deliveryMethod')}
+                      value="whatsapp"
+                      className="mr-2"
+                    />
+                    <span>WhatsApp</span>
+                  </label>
+                </div>
+                {userInfoForm.formState.errors.deliveryMethod && (
+                  <p className="mt-1 text-sm text-red-600">{userInfoForm.formState.errors.deliveryMethod.message}</p>
                 )}
               </div>
             </div>
-          )}
 
-          <div className="flex justify-between">
-            {step === 2 && (
+            <div className="flex justify-between">
               <button
                 type="button"
                 onClick={prevStep}
@@ -283,17 +408,6 @@ function Signup() {
               >
                 Back
               </button>
-            )}
-            {step === 1 ? (
-              <button
-                type="button"
-                onClick={nextStep}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                disabled={!watchedFields.firstName || !watchedFields.lastName || !watchedFields.country || countriesLoading}
-              >
-                Next
-              </button>
-            ) : (
               <button
                 type="submit"
                 disabled={loading}
@@ -301,9 +415,9 @@ function Signup() {
               >
                 {loading ? 'Creating account...' : 'Create Account'}
               </button>
-            )}
-          </div>
-        </form>
+            </div>
+          </form>
+        )}
 
         <div className="text-center">
           <span className="text-sm text-gray-600">Already have an account? </span>
