@@ -48,14 +48,14 @@ Deno.serve(async (req) => {
       })
     }
 
-    if (!resendOnly && (!password || !firstName || !lastName || !country)) {
+    if (!resendOnly && (!firstName || !lastName || !country)) {
       return new Response(JSON.stringify({ error: 'All fields are required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders() }
       })
     }
 
-    // Validate password strength if not resendOnly
+    // Validate password strength if not resendOnly and password is provided
     if (!resendOnly && password) {
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&.]{8,}$/
       if (!passwordRegex.test(password)) {
@@ -96,10 +96,13 @@ Deno.serve(async (req) => {
     let user = existingUser
 
     if (!resendOnly) {
+      // Use dummy password if not provided
+      const userPassword = password || 'TempPassword123!'
+
       // Create user
       const { data: newUser, error: createError } = await admin.auth.admin.createUser({
         email,
-        password,
+        password: userPassword,
         user_metadata: {
           first_name: firstName,
           last_name: lastName,

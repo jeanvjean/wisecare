@@ -38,13 +38,42 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE)
   const token = authHeader.replace('Bearer ', '')
+  // First try to get user with the provided token
   const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
   if (authError || !user) {
-    return new Response(JSON.stringify({ error: 'Invalid token' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+    console.error('Invalid token error:', authError)
+    console.error('Token validation details:', {
+      tokenPresent: !!token,
+      tokenLength: token?.length,
+      authError: authError?.message,
+      userPresent: !!user
     })
+
+    // If token validation fails, try to get session from headers
+    try {
+      // Try to get session from Authorization header
+      const sessionResponse = await supabase.auth.getSession()
+      const session = sessionResponse.data.session
+
+      if (!session?.user) {
+        console.error('No user in session from headers')
+        return new Response(JSON.stringify({ error: 'Invalid token', details: 'No user in session' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+        })
+      }
+
+      // Use the session user
+      user = session.user
+      console.log('Using session user from headers:', user.id)
+    } catch (sessionError) {
+      console.error('Session retrieval failed:', sessionError)
+      return new Response(JSON.stringify({ error: 'Invalid token', details: 'Session retrieval failed' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+      })
+    }
   }
 
   const origin = req.headers.get('origin') || req.headers.get('referer') || 'http://localhost:5173'

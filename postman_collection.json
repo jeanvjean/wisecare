@@ -52,14 +52,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"StrongPass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"country\": \"nigeria\"\n}"
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"StrongPass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"country\": \"nigeria\",\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"sms\"\n}"
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/signup",
               "host": ["{{SUPABASE_URL}}"],
               "path": ["functions", "v1", "signup"]
             },
-            "description": "Create a new user account and send email verification OTP"
+            "description": "Create a new user account and send email verification OTP. Optional: include phoneNumber and deliveryMethod ('sms' or 'whatsapp') to also trigger phone verification."
           },
           "response": [
             {
@@ -157,14 +157,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"sms\",\n  \"email\": \"user@example.com\"\n}"
+              "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"sms\",\n  \"email\": \"user@example.com\",\n  \"country\": \"nigeria\"\n}"
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/send-phone-otp",
               "host": ["{{SUPABASE_URL}}"],
               "path": ["functions", "v1", "send-phone-otp"]
             },
-            "description": "Send OTP to phone number via SMS or WhatsApp. Set deliveryMethod to 'sms' or 'whatsapp'. Country is automatically determined from user profile."
+            "description": "Send OTP to phone number via SMS or WhatsApp. Set deliveryMethod to 'sms' or 'whatsapp'. Country can be specified or defaults to user profile country."
           },
           "response": [
             {
@@ -240,14 +240,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"whatsapp\",\n  \"email\": \"user@example.com\"\n}"
+              "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"whatsapp\",\n  \"email\": \"user@example.com\",\n  \"country\": \"nigeria\"\n}"
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/send-phone-otp",
               "host": ["{{SUPABASE_URL}}"],
               "path": ["functions", "v1", "send-phone-otp"]
             },
-            "description": "Send OTP to phone number via WhatsApp. Requires WhatsApp Business API setup."
+            "description": "Send OTP to phone number via WhatsApp. Requires WhatsApp Business API setup. Country can be specified or defaults to user profile country."
           }
         },
         {
@@ -267,14 +267,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"otp\": \"123456\",\n  \"email\": \"user@example.com\"\n}"
+              "raw": "{\n  \"phoneNumber\": \"+2341234567890\",\n  \"otp\": \"123456\",\n  \"email\": \"user@example.com\",\n  \"deliveryMethod\": \"sms\"\n}"
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/verify-phone-otp",
               "host": ["{{SUPABASE_URL}}"],
               "path": ["functions", "v1", "verify-phone-otp"]
             },
-            "description": "Verify phone number with OTP code"
+            "description": "Verify phone number with OTP code. Optional: include deliveryMethod ('sms' or 'whatsapp') to match the delivery method used."
           }
         }
       ]
@@ -786,14 +786,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"carePreference\": \"family_care\",\n  \"mattersMost\": [\"health\", \"safety\"],\n  \"ageRanges\": [\"18 - 60 (Adult and dependents)\", \"Over 60 (Parents and senior)\"],\n  \"fundingFrequency\": \"monthly\",\n  \"paymentFrequency\": \"monthly\",\n  \"numberOfLovedOnes\": 2,\n  \"lovedOnesCountries\": [\"nigeria\", \"united_kingdom\"],\n  \"lovedOnesCities\": [\"uuid-city-1\", \"uuid-city-2\"]\n}"
+              "raw": "{\n  \"carePreference\": \"family_care\",\n  \"mattersMost\": [\"health\", \"safety\"],\n  \"ageRanges\": [\"18 - 60 (Adult and dependents)\", \"Over 60 (Parents and senior)\"],\n  \"fundingFrequency\": \"monthly\",\n  \"paymentFrequency\": \"monthly\",\n  \"numberOfLovedOnes\": 2,\n  \"lovedOnesCountries\": [\"nigeria\", \"united_kingdom\"],\n  \"lovedOnesCities\": [\"uuid-city-1\", \"uuid-city-2\"],\n  \"informMeOfCountries\": [\"nigeria\", \"united_kingdom\"],\n  \"informMeStatus\": true\n}"
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/complete-onboarding",
               "host": ["{{SUPABASE_URL}}"],
               "path": ["functions", "v1", "complete-onboarding"]
             },
-            "description": "Complete user onboarding with preferences and loved ones information"
+            "description": "Complete user onboarding with preferences and loved ones information. Optional: include informMeOfCountries (array of country codes) and informMeStatus (boolean) for notification preferences."
           }
         },
         {

@@ -39,6 +39,21 @@ function VerifyPhoneOTP() {
     setDeliveryMethod(methodParam)
   }, [phoneParam, methodParam])
 
+  // Automatically send phone OTP on page load if phone number is available
+  useEffect(() => {
+    const sendOtp = async () => {
+      if (phoneNumber && email) {
+        try {
+          await sendPhoneOTP(phoneNumber, email, deliveryMethod)
+          setOtpSent(true)
+        } catch (err: any) {
+          setError(err.message)
+        }
+      }
+    }
+    sendOtp()
+  }, [phoneNumber, email, deliveryMethod, sendPhoneOTP])
+
   // If phone is already verified, do not show this page — redirect appropriately
   useEffect(() => {
     const checkProfile = async () => {
@@ -72,7 +87,8 @@ function VerifyPhoneOTP() {
       if (meta.onboarding_completed) {
         navigate('/dashboard')
       } else {
-        navigate('/onboarding')
+        // Redirect to set password page after phone verification
+        navigate(`/set-password?email=${encodeURIComponent(email)}`)
       }
     } catch (err: any) {
       setError(err.message)

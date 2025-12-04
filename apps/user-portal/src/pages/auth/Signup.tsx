@@ -16,12 +16,7 @@ const userInfoSchema = z.object({
   lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email('Invalid email address'),
   phoneNumber: z.string().min(1, 'Phone number is required'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
   deliveryMethod: z.enum(['sms', 'whatsapp']).default('sms')
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
 })
 
 // Combined schema for form validation
@@ -31,12 +26,7 @@ const signupSchema = z.object({
   lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email('Invalid email address'),
   phoneNumber: z.string().min(1, 'Phone number is required'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
   deliveryMethod: z.enum(['sms', 'whatsapp']).default('sms')
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
 })
 
 type CountryForm = z.infer<typeof countrySchema>
@@ -47,8 +37,6 @@ function Signup() {
   const { signUp, loading } = useAuthStore()
   const [error, setError] = useState<string | null>(null)
   const [step, setStep] = useState(1)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([])
   const [countriesLoading, setCountriesLoading] = useState(true)
   const [formData, setFormData] = useState<SignupForm>({
@@ -57,8 +45,6 @@ function Signup() {
     lastName: '',
     email: '',
     phoneNumber: '',
-    password: '',
-    confirmPassword: '',
     deliveryMethod: 'sms'
   })
   const navigate = useNavigate()
@@ -79,8 +65,6 @@ function Signup() {
       lastName: formData.lastName,
       email: formData.email,
       phoneNumber: formData.phoneNumber,
-      password: formData.password,
-      confirmPassword: formData.confirmPassword,
       deliveryMethod: formData.deliveryMethod
     }
   })
@@ -198,7 +182,6 @@ function Signup() {
         country: completeFormData.country,
         email: completeFormData.email,
         phoneNumber: completeFormData.phoneNumber,
-        password: completeFormData.password,
         deliveryMethod: completeFormData.deliveryMethod
       })
 
@@ -323,52 +306,6 @@ function Signup() {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      {...userInfoForm.register('password')}
-                      type={showPassword ? 'text' : 'password'}
-                      className="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                    >
-                      {showPassword ? 'Hide' : 'Show'}
-                    </button>
-                  </div>
-                  {userInfoForm.formState.errors.password && (
-                    <p className="mt-1 text-sm text-red-600">{userInfoForm.formState.errors.password.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                    Confirm Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      {...userInfoForm.register('confirmPassword')}
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      className="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                    >
-                      {showConfirmPassword ? 'Hide' : 'Show'}
-                    </button>
-                  </div>
-                  {userInfoForm.formState.errors.confirmPassword && (
-                    <p className="mt-1 text-sm text-red-600">{userInfoForm.formState.errors.confirmPassword.message}</p>
-                  )}
-                </div>
-              </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">

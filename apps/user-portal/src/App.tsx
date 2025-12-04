@@ -22,6 +22,7 @@ import CheckoutSuccess from './pages/CheckoutSuccess'
 import Billing from './pages/Billing'
 import FileUpload from './pages/FileUpload'
 import WebAuthnRegister from './pages/WebAuthnRegister'
+import SetPassword from './pages/auth/SetPassword'
 
 const queryClient = new QueryClient()
 
@@ -162,6 +163,9 @@ function AppContent() {
         {/* Phone verification routes - accessible even when logged in; redirect away if already verified */}
         <Route path="/add-phone-number" element={needsPhoneVerification ? <AddPhoneNumber /> : <Navigate to={defaultRoute} replace />} />
         <Route path="/verify-phone-otp" element={needsPhoneVerification ? <VerifyPhoneOTP /> : <Navigate to={defaultRoute} replace />} />
+
+        {/* Password setup after phone verification */}
+        <Route path="/set-password" element={<SetPassword />} />
 
         {/* Onboarding and other routes */}
         <Route path="/onboarding" element={<Onboarding />} />

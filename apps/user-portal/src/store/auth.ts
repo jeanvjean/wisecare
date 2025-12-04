@@ -5,13 +5,14 @@ interface AuthState {
   user: any
   loading: boolean
   setUser: (user: any) => void
-  signUp: (data: { firstName: string; lastName: string; country: string; email: string; password: string; phoneNumber: string; deliveryMethod: 'sms' | 'whatsapp' }) => Promise<void>
+  signUp: (data: { firstName: string; lastName: string; country: string; email: string; phoneNumber: string; deliveryMethod: 'sms' | 'whatsapp' }) => Promise<void>
   signIn: (email: string, password: string) => Promise<{ needsEmailVerification: boolean; needsPhoneVerification: boolean; needsOnboarding: boolean; needsPlanSelection: boolean }>
   signInWithWebAuthn: (email: string) => Promise<void>
   registerWebAuthn: () => Promise<void>
   verifyOTP: (email: string, token: string) => Promise<void>
   sendPhoneOTP: (phoneNumber: string, email?: string, deliveryMethod?: 'sms' | 'whatsapp') => Promise<void>
   verifyPhoneOTP: (phoneNumber: string, token: string, email?: string) => Promise<{ session?: any; requiresLogin?: boolean }>
+  setPassword: (password: string) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -31,7 +32,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         },
         body: JSON.stringify({
           email: data.email,
-          password: data.password,
           firstName: data.firstName,
           lastName: data.lastName,
           country: data.country,
@@ -361,8 +361,67 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ loading: false })
     }
   },
+  setPassword: async (password) => {
+    set({ loading: true })
+    try {
+      const headers: any = {
+        'Content-Type': 'application/json',
+        apikey: import.meta.env.VITE_SUPABASE_ANON_KEY
+      }
+
+      // Set authorization header - use session token if available
+      const currentSession = (await supabase.auth.getSession()).data.session
+      if (currentSession) {
+        headers.Authorization = `Bearer ${currentSession.access_token}`
+      } else {
+        throw new Error('No active session')
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/set-password`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ password })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to set password')
+      }
+
+      return await response.json()
+    } finally {
+      set({ loading: false })
+    }
+  },
   signOut: async () => {
-    await supabase.auth.signOut()
+    try {
+      // First try to sign out normally
+      await supabase.auth.signOut()
+    } catch (error) {
+      console.warn('Sign out failed, attempting to refresh session and retry:', error)
+
+      try {
+        // If normal sign out fails, try to refresh the session and sign out again
+        const { data: { session }, error: refreshError } = await supabase.auth.refreshSession()
+        if (!refreshError && session) {
+          await supabase.auth.signOut()
+        } else {
+          // If refresh also fails, force clear local session
+          console.warn('Session refresh failed, force clearing local session:', refreshError)
+          // Clear Supabase's local session storage
+          localStorage.removeItem('sb-' + import.meta.env.VITE_SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token')
+          sessionStorage.removeItem('sb-' + import.meta.env.VITE_SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token')
+        }
+      } catch (retryError) {
+        console.warn('Retry sign out failed, force clearing local session:', retryError)
+        // Force clear local session storage as last resort
+        const projectRef = import.meta.env.VITE_SUPABASE_URL.split('//')[1].split('.')[0]
+        localStorage.removeItem(`sb-${projectRef}-auth-token`)
+        sessionStorage.removeItem(`sb-${projectRef}-auth-token`)
+      }
+    }
+
+    // Always clear the local user state
     set({ user: null })
   }
 }))
