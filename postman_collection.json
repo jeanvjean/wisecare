@@ -52,12 +52,18 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"StrongPass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"country\": \"nigeria\",\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"sms\"\n}"
+              "raw": "{\n  \"email\": \"user@example.com\", \n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"country\": \"nigeria\",\n  \"phoneNumber\": \"+2341234567890\",\n  \"deliveryMethod\": \"sms\"\n}"
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/signup",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "signup"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "signup"
+              ]
             },
             "description": "Create a new user account and send email verification OTP. Optional: include phoneNumber and deliveryMethod ('sms' or 'whatsapp') to also trigger phone verification."
           },
@@ -69,12 +75,18 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"StrongPass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"country\": \"nigeria\"\n}"
+                  "raw": "{\n  \"email\": \"user@example.com\",\n \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"country\": \"nigeria\"\n}"
                 },
                 "url": {
                   "raw": "{{SUPABASE_URL}}/functions/v1/signup",
-                  "host": ["{{SUPABASE_URL}}"],
-                  "path": ["functions", "v1", "signup"]
+                  "host": [
+                    "{{SUPABASE_URL}}"
+                  ],
+                  "path": [
+                    "functions",
+                    "v1",
+                    "signup"
+                  ]
                 }
               },
               "status": "OK",
@@ -107,8 +119,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/signup",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "signup"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "signup"
+              ]
             },
             "description": "Resend email verification OTP for existing unverified user"
           }
@@ -129,8 +147,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/signup",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "signup"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "signup"
+              ]
             },
             "description": "Verify email with OTP code"
           }
@@ -161,8 +185,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/send-phone-otp",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "send-phone-otp"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "send-phone-otp"
+              ]
             },
             "description": "Send OTP to phone number via SMS or WhatsApp. Set deliveryMethod to 'sms' or 'whatsapp'. Country can be specified or defaults to user profile country."
           },
@@ -178,8 +208,14 @@
                 },
                 "url": {
                   "raw": "{{SUPABASE_URL}}/functions/v1/send-phone-otp",
-                  "host": ["{{SUPABASE_URL}}"],
-                  "path": ["functions", "v1", "send-phone-otp"]
+                  "host": [
+                    "{{SUPABASE_URL}}"
+                  ],
+                  "path": [
+                    "functions",
+                    "v1",
+                    "send-phone-otp"
+                  ]
                 }
               },
               "status": "OK",
@@ -205,8 +241,14 @@
                 },
                 "url": {
                   "raw": "{{SUPABASE_URL}}/functions/v1/send-phone-otp",
-                  "host": ["{{SUPABASE_URL}}"],
-                  "path": ["functions", "v1", "send-phone-otp"]
+                  "host": [
+                    "{{SUPABASE_URL}}"
+                  ],
+                  "path": [
+                    "functions",
+                    "v1",
+                    "send-phone-otp"
+                  ]
                 }
               },
               "status": "OK",
@@ -244,8 +286,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/send-phone-otp",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "send-phone-otp"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "send-phone-otp"
+              ]
             },
             "description": "Send OTP to phone number via WhatsApp. Requires WhatsApp Business API setup. Country can be specified or defaults to user profile country."
           }
@@ -271,8 +319,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/verify-phone-otp",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "verify-phone-otp"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "verify-phone-otp"
+              ]
             },
             "description": "Verify phone number with OTP code. Optional: include deliveryMethod ('sms' or 'whatsapp') to match the delivery method used."
           }
@@ -298,8 +352,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/signin",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "signin"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "signin"
+              ]
             },
             "description": "Sign in user with email and password"
           }
@@ -320,8 +380,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/send-reset-otp",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "send-reset-otp"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "send-reset-otp"
+              ]
             },
             "description": "Send password reset OTP to email"
           }
@@ -342,8 +408,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/verify-reset-otp",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "verify-reset-otp"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "verify-reset-otp"
+              ]
             },
             "description": "Verify password reset OTP and get recovery token"
           }
@@ -364,11 +436,85 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/reset-password",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "reset-password"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "reset-password"
+              ]
             },
             "description": "Reset user password with OTP verification"
           }
+        },
+        {
+          "name": "Set Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}",
+                "description": "Required: User authentication token"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"NewStrongPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/set-password",
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "set-password"
+              ]
+            },
+            "description": "Set or update user password. Requires authentication. Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"password\": \"NewStrongPass123!\"\n}"
+                },
+                "url": {
+                  "raw": "{{SUPABASE_URL}}/functions/v1/set-password",
+                  "host": [
+                    "{{SUPABASE_URL}}"
+                  ],
+                  "path": [
+                    "functions",
+                    "v1",
+                    "set-password"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Password set successfully\"\n}"
+            }
+          ]
         }
       ]
     },
@@ -387,8 +533,14 @@
             ],
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/webauthn-register",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "webauthn-register"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "webauthn-register"
+              ]
             },
             "description": "Get WebAuthn registration options for biometric authentication setup"
           }
@@ -413,8 +565,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/webauthn-register",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "webauthn-register"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "webauthn-register"
+              ]
             },
             "description": "Register a WebAuthn credential for biometric authentication"
           }
@@ -435,8 +593,15 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/webauthn-authenticate/options",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "webauthn-authenticate", "options"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "webauthn-authenticate",
+                "options"
+              ]
             },
             "description": "Get WebAuthn authentication options for sign-in"
           }
@@ -457,8 +622,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/webauthn-authenticate",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "webauthn-authenticate"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "webauthn-authenticate"
+              ]
             },
             "description": "Authenticate user with WebAuthn biometric credential"
           }
@@ -480,8 +651,14 @@
             ],
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/get-plans",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "get-plans"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "get-plans"
+              ]
             },
             "description": "Get all available subscription plans"
           }
@@ -506,8 +683,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/create-checkout",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "create-checkout"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "create-checkout"
+              ]
             },
             "description": "Create a Chargebee hosted checkout session for subscription. Include promoCode for discount application."
           },
@@ -523,8 +706,14 @@
                 },
                 "url": {
                   "raw": "{{SUPABASE_URL}}/functions/v1/create-checkout",
-                  "host": ["{{SUPABASE_URL}}"],
-                  "path": ["functions", "v1", "create-checkout"]
+                  "host": [
+                    "{{SUPABASE_URL}}"
+                  ],
+                  "path": [
+                    "functions",
+                    "v1",
+                    "create-checkout"
+                  ]
                 }
               },
               "status": "OK",
@@ -550,8 +739,14 @@
                 },
                 "url": {
                   "raw": "{{SUPABASE_URL}}/functions/v1/create-checkout",
-                  "host": ["{{SUPABASE_URL}}"],
-                  "path": ["functions", "v1", "create-checkout"]
+                  "host": [
+                    "{{SUPABASE_URL}}"
+                  ],
+                  "path": [
+                    "functions",
+                    "v1",
+                    "create-checkout"
+                  ]
                 }
               },
               "status": "Bad Request",
@@ -588,8 +783,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/create-checkout",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "create-checkout"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "create-checkout"
+              ]
             },
             "description": "Create a Chargebee hosted checkout session without promo code"
           }
@@ -606,8 +807,14 @@
             ],
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/get-current-subscription",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "get-current-subscription"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "get-current-subscription"
+              ]
             },
             "description": "Get user's current subscription details"
           }
@@ -624,8 +831,14 @@
             ],
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/get-billing-history",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "get-billing-history"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "get-billing-history"
+              ]
             },
             "description": "Get user's billing history and invoices"
           }
@@ -650,8 +863,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/cancel-subscription",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "cancel-subscription"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "cancel-subscription"
+              ]
             },
             "description": "Cancel user's subscription with optional feedback"
           }
@@ -676,8 +895,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/reactivate-subscription",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "reactivate-subscription"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "reactivate-subscription"
+              ]
             },
             "description": "Reactivate a cancelled subscription"
           }
@@ -707,8 +932,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/add-beneficiary",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "add-beneficiary"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "add-beneficiary"
+              ]
             },
             "description": "Add a new beneficiary to the user's account"
           }
@@ -733,8 +964,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/remove-beneficiary",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "remove-beneficiary"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "remove-beneficiary"
+              ]
             },
             "description": "Remove a beneficiary from the user's account"
           }
@@ -759,8 +996,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/activate-beneficiaries",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "activate-beneficiaries"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "activate-beneficiaries"
+              ]
             },
             "description": "Activate multiple beneficiaries for coverage"
           }
@@ -790,8 +1033,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/complete-onboarding",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "complete-onboarding"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "complete-onboarding"
+              ]
             },
             "description": "Complete user onboarding with preferences and loved ones information. Optional: include informMeOfCountries (array of country codes) and informMeStatus (boolean) for notification preferences."
           }
@@ -812,8 +1061,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/get-user-by-email",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "get-user-by-email"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "get-user-by-email"
+              ]
             },
             "description": "Get user information by email address (admin function)"
           }
@@ -843,8 +1098,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/send-purchase-success-email",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "send-purchase-success-email"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "send-purchase-success-email"
+              ]
             },
             "description": "Send purchase confirmation email after successful subscription"
           }
@@ -865,8 +1126,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/send-waitlist-email",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "send-waitlist-email"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "send-waitlist-email"
+              ]
             },
             "description": "Send welcome email to users joining the waitlist"
           }
@@ -897,8 +1164,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/create-campaign",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "create-campaign"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "create-campaign"
+              ]
             },
             "description": "Create a new discount campaign. NOTE: On Chargebee Product Catalog 2.0 we do NOT create coupons via API. You must create the coupon in Chargebee first, then pass its ID in `chargebeeCouponId` (or ensure `code` matches the Chargebee coupon ID). The function only stores the mapping and uses it later during checkout. Requires admin authentication.\n\nBody fields:\n- name (string, required)\n- description (string, optional)\n- code (string, required) – human-friendly promo code, also used as fallback coupon ID\n- discountType (\"fixed\" | \"percentage\", required)\n- discountValue (number, required) – e.g. 10.0 for $10, 0.2 for 20%\n- validFrom / validUntil (ISO datetime strings, optional)\n- usageLimit (number, optional)\n- applicablePlans (array of plan IDs or null, optional)\n- chargebeeCouponId (string, optional but recommended) – existing Chargebee coupon ID for PC 2.0"
           },
@@ -914,8 +1187,14 @@
                 },
                 "url": {
                   "raw": "{{SUPABASE_URL}}/functions/v1/create-campaign",
-                  "host": ["{{SUPABASE_URL}}"],
-                  "path": ["functions", "v1", "create-campaign"]
+                  "host": [
+                    "{{SUPABASE_URL}}"
+                  ],
+                  "path": [
+                    "functions",
+                    "v1",
+                    "create-campaign"
+                  ]
                 }
               },
               "status": "OK",
@@ -953,8 +1232,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/create-campaign",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "create-campaign"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "create-campaign"
+              ]
             },
             "description": "Create a fixed amount discount campaign. Set applicablePlans to array of plan IDs or null for all plans."
           }
@@ -984,8 +1269,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/chargebee-webhook",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "chargebee-webhook"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "chargebee-webhook"
+              ]
             },
             "description": "Handle Chargebee webhook events for subscription management"
           }
@@ -1006,8 +1297,14 @@
             },
             "url": {
               "raw": "{{SUPABASE_URL}}/functions/v1/upsert-subscription",
-              "host": ["{{SUPABASE_URL}}"],
-              "path": ["functions", "v1", "upsert-subscription"]
+              "host": [
+                "{{SUPABASE_URL}}"
+              ],
+              "path": [
+                "functions",
+                "v1",
+                "upsert-subscription"
+              ]
             },
             "description": "Create or update subscription record (typically called by webhooks)"
           }
