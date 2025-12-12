@@ -92,6 +92,14 @@ Deno.serve(async (req) => {
       .map((it: any) => it.item_price)
       // Ensure we only expose actual plan item prices (exclude addons/charges)
       .filter((ip: any) => ip && ip.status === 'active' && ip.item_type === 'plan' && (ip.currency_code || 'USD').toUpperCase() === useCurrency.toUpperCase())
+      // Filter to only include Care, Care Plus, and Care Max plans
+      .filter((ip: any) => {
+        const planName = (ip.item_id || '').trim();
+        // Exact matching for the specific plan names we want
+        return planName === 'care' ||
+               planName === 'care-plus' ||
+               planName === 'care-max';
+      })
       .map((ip: any) => ({
         // For PC 2.0, item price is the purchasable entity
         id: ip.id, // keep for backwards compatibility

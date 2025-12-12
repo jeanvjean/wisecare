@@ -4,9 +4,13 @@
 // Country codes configuration
 const COUNTRY_CODES = {
   nigeria: '+234',
-  united_kingdom: '+44',
-  united_states: '+1',
-  canada: '+1'
+  ng: '+234',
+  "united kingdom": '+44',
+  gb: '+44',
+  "united states": '+1',
+  us: '+1',
+  canada: '+1',
+  ca: '+1'
 } as const
 
 type CountryCode = typeof COUNTRY_CODES[keyof typeof COUNTRY_CODES]
